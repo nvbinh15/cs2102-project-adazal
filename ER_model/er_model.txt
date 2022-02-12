@@ -1,0 +1,28 @@
+[Shops](sid*, name);
+[[Products]](pid*, name, category, manufacturer, description, price, quantity);
+[Manufacturers](mid* , name, country);
+[Categories](cid*, name, parent_category);
+[Employees](edi*, name, monthly_salary);
+[Users](uid*, name, address);
+
+
+[<Comments>](content, rating);
+<Replies>(content);
+[<CartItems>](quantity, shipping_cost, delivery_date);
+<<Sells>>();
+<Orders>(total_shipping_cost, shipping_address, status, estimated_delivery_date);
+
+
+Shops --- Sells;
+Products ==> Sells;
+
+Products --- CartItems;
+
+CartItems --- Orders;
+Users --- Orders;
+
+Users --- Comments;
+CartItems --- Comments;
+
+Comments --- Replies;
+Users --- Replies;
