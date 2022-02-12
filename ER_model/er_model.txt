@@ -1,28 +1,71 @@
 [Shops](sid*, name);
-[[Products]](pid*, name, category, manufacturer, description, price, quantity);
+[[Products]](pid*, name, description, price, quantity);
 [Manufacturers](mid* , name, country);
-[Categories](cid*, name, parent_category);
+[Categories](cid*, name);
 [Employees](edi*, name, monthly_salary);
 [Users](uid*, name, address);
+[[Orders]](order_id*, total_cost, shipping_address, status, estimated_delivery_date);
+[Refunds](rid*);
+[Coupons](cid*, reward, validity_period, minimum_order_value);
 
+[<Comments>](content, rating, created_timestamp);
+<Replies>(content, created_timestamp);
+[<ArchivedComments>](content, rating, created_timestamp*);
+<ArchivedReplies>(content, created_timestamp*);
 
-[<Comments>](content, rating);
-<Replies>(content);
-[<CartItems>](quantity, shipping_cost, delivery_date);
+<ParentCategory>();
+[<Includes>](shipping_cost, delivery_date);
 <<Sells>>();
-<Orders>(total_shipping_cost, shipping_address, status, estimated_delivery_date);
+<<Places>>();
+<Produces>();
+<BelongsTo>();
+<Requests>(date);
+<Handles>(status, reason_of_rejection, processed_date);
 
+<Rewarded>(issued_date, quantity);
+<Applies>();
 
 Shops --- Sells;
 Products ==> Sells;
 
-Products --- CartItems;
+Products --- Includes;
+Orders === Includes;
 
-CartItems --- Orders;
-Users --- Orders;
-
-Users --- Comments;
-CartItems --- Comments;
-
-Comments --- Replies;
+Users --> Comments;
+Includes --- Comments;
 Users --- Replies;
+Comments --- Replies;
+
+
+Users --- ArchivedComments;
+Includes --- ArchivedComments;
+Users --- ArchivedReplies;
+ArchivedComments --- ArchivedReplies;
+
+
+Manufacturers --- Produces;
+Products ==> Produces;
+
+Categories --> ParentCategory;
+Categories --- ParentCategory;
+
+Categories --- BelongsTo;
+Products === BelongsTo;
+
+Users --- Places;
+Orders ==> Places;
+
+Users --- Requests;
+Refunds --- Requests;
+
+Refunds === Includes;
+
+Employees --- Handles;
+Refunds ==> Handles;
+
+Users --- Rewarded;
+Coupons --- Rewarded;
+
+Users --- Applies;
+Coupons --> Applies;
+Orders --- Applies;

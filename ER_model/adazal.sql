@@ -67,8 +67,19 @@ CREATE TABLE Comments (
     user INTEGER REFERENCES Users ON DELETE CASCADE ON UPDATE CASCADE,
     shop INTEGER REFERENCES Products ON DELETE CASCADE ON UPDATE CASCADE,
     product INTEGER REFERENCES Products ON DELETE CASCADE ON UPDATE CASCADE,
+    created_timestamp CURRENT_TIMESTAMP,
     content TEXT,
-    PRIMARY KEY (user, shop, product)
+    rating INTEGER CHECK (rating IN (1,2,3,4,5))
+    PRIMARY KEY (user, shop, product, created_timestamp)
 );
 
+CREATE TABLE ArchivedComments (
+    user INTEGER REFERENCES Users,
+    shop INTEGER REFERENCES Products,
+    product INTEGER REFERENCES Products,
+    created_timestamp CURRENT_TIMESTAMP,
+    content TEXT,
+    rating INTEGER CHECK (rating IN (1,2,3,4,5))
+    PRIMARY KEY (user, shop, product, created_timestamp)
+);
 
