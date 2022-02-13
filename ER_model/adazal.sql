@@ -10,13 +10,13 @@ CREATE TABLE Shops (
 CREATE TABLE Products (
     pid INTEGER,
     name TEXT,
-    category INTEGER REFERENCES Categories,
-    manufacturer INTEGER REFERENCES Manufacturers,
+    category INTEGER REFERENCES Categories ON UPDATE CASCADE,
+    manufacturer_id INTEGER REFERENCES Manufacturers ON UPDATE CASCADE,
     description TEXT,
-    shop INTEGER REFERENCES Shops ON DELETE CASCADE ON UPDATE CASCADE, 
-    price NUMERIC,
-    quantity INTEGER CHECK (integer >= 0),
-    PRIMARY KEY (pid, shop) -- shop?
+    shop_id INTEGER REFERENCES Shops ON DELETE CASCADE ON UPDATE CASCADE, 
+    price NUMERIC CHECK (price >= 0),
+    quantity INTEGER CHECK (quantity >= 0),
+    PRIMARY KEY (pid, shop_id)
 );
 
 CREATE TABLE Manufacturers (
@@ -28,19 +28,21 @@ CREATE TABLE Manufacturers (
 CREATE TABLE Categories (
     cid INTEGER PRIMARY KEY,
     name TEXT,
-    parent_category INTEGER DEFAULT NULL REFERENCES Categories
+    parent_id INTEGER DEFAULT NULL REFERENCES Categories,
+    CHECK (cid IS DISTINCT FROM parent_id)
 );
 
 CREATE TABLE Employees (
     eid INTEGER PRIMARY KEY,
     name TEXT, 
-    monthly_salary NUMERIC
+    monthly_salary NUMERIC CHECK (monthly_salary >= 0)
 );
 
 CREATE TABLE Users (
     uid INTEGER PRIMARY KEY,
-    name TEXT,
-    address TEXT
+    name TEXT, 
+    address TEXT,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE CartItems (
