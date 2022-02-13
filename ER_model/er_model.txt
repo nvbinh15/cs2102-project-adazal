@@ -3,7 +3,7 @@
 [Manufacturers](mid* , name, country);
 [Categories](cid*, name);
 [Employees](edi*, name, monthly_salary);
-[Users](uid*, name, address);
+[Users](uid*, name, address, is_deleted);
 [[Orders]](order_id*, total_cost, shipping_address, status, estimated_delivery_date);
 [Refunds](rid*);
 [Coupons](cid*, reward, validity_period, minimum_order_value);
@@ -13,6 +13,11 @@
 [<ArchivedComments>](content, rating, created_timestamp*);
 <ArchivedReplies>(content, created_timestamp*);
 
+[Complaints](cid*, status);
+[ShopComplaints]();
+[CommentComplaints]();
+[OrderComplaints]();
+
 <ParentCategory>();
 [<Includes>](shipping_cost, delivery_date);
 <<Sells>>();
@@ -20,10 +25,16 @@
 <Produces>();
 <BelongsTo>();
 <Requests>(date);
-<Handles>(status, reason_of_rejection, processed_date);
+<HandlesRefunds>(status, reason_of_rejection, processed_date);
 
 <Rewarded>(issued_date, quantity);
 <Applies>();
+[<Files>]();
+<AboutShops>();
+<AboutComments>();
+<AboutOrders>();
+
+<HandlesComplaints>();
 
 Shops --- Sells;
 Products ==> Sells;
@@ -60,8 +71,8 @@ Refunds --- Requests;
 
 Refunds === Includes;
 
-Employees --- Handles;
-Refunds ==> Handles;
+Employees --- HandlesRefunds;
+Refunds ==> HandlesRefunds;
 
 Users --- Rewarded;
 Coupons --- Rewarded;
@@ -69,3 +80,19 @@ Coupons --- Rewarded;
 Users --- Applies;
 Coupons --> Applies;
 Orders --- Applies;
+
+Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints};
+Users --- Files;
+Complaints --- Files;
+
+ShopComplaints --- AboutShops;
+Shops --- AboutShops;
+
+OrderComplaints --- AboutOrders;
+Orders --- AboutOrders;
+
+CommentComplaints --- AboutComments;
+Comments --- AboutComments;
+
+Employees --- HandlesComplaints;
+Files ==> HandlesComplaints;
