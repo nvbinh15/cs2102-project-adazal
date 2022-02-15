@@ -12,6 +12,8 @@
 [ShopComplaints]();
 [CommentComplaints]();
 [OrderComplaints]();
+[CartItemComplaints]();
+
 
 [[CartItems]](cid*, shipping_cost, delivery_date);
 
@@ -34,6 +36,7 @@
 <AboutShops>();
 <AboutComments>();
 <AboutOrders>();
+<AboutCartItems>();
 
 <HandlesComplaints>();
 
@@ -92,7 +95,7 @@ Users --- Applies;
 Coupons --> Applies;
 Orders --- Applies;
 
-Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints};
+Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints, CartItemComplaints};
 Users --- Files;
 Complaints --- Files;
 
@@ -104,6 +107,9 @@ Orders --- AboutOrders;
 
 CommentComplaints --- AboutComments;
 Comments --- AboutComments;
+
+CartItemComplaints --- AboutCartItems;
+CartItems --- AboutCartItems;
 
 Employees --- HandlesComplaints;
 Files ==> HandlesComplaints;
