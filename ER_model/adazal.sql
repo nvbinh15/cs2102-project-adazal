@@ -34,8 +34,7 @@ CREATE TABLE Products (
     shop_id INTEGER REFERENCES Shops ON DELETE CASCADE ON UPDATE CASCADE, 
     price NUMERIC CHECK (price >= 0),
     quantity INTEGER CHECK (quantity >= 0),
-    -- Product is a week entity of shop
-    PRIMARY KEY (pid, shop_id)
+    PRIMARY KEY (pid)
 );
 
 CREATE TABLE Employees (
@@ -65,8 +64,6 @@ CREATE TABLE CartItems (
     cart_id INTEGER,
     product_id INTEGER NOT NULL,
     order_id INTEGER NOT NULL,
-    -- Add shop_id as an foreign key to CartItems reference Products
-    shop_id INTEGER NOT NULL,
     -- Add user_id as an foregin key to CartItems reference Orders
     user_id INTEGER NOT NULL,
     status TEXT CHECK (status IN ('being processed', 'shipped', 'delivered')),
@@ -75,20 +72,19 @@ CREATE TABLE CartItems (
     estimated_delivery_date DATE,
     delivery_date DATE,
     PRIMARY KEY (order_id, cart_id),
-    FOREIGN KEY (product_id, shop_id) REFERENCES Products(pid, order_id) 
+    FOREIGN KEY (product_id) REFERENCES Products(pid) 
     ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (order_id, user_id) REFERENCES Orders(order_id, user_id)
     ON DELETE CASCADE ON UPDATE CASCADE
-    UNIQUE (user_id, order_id, product_id, shop_id)
+    UNIQUE (user_id, order_id, product_id)
 );
 
 CREATE TABLE Refunds (
     rid INTEGER,
     refund_quantity INTEGER CHECK (refund_quantity > 0),
-    shop_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    FOREIGN KEY (product_id, shop_id) REFERENCES CartItems(product_id, shop_id)
-    ON DELETE CASCADE ON UPDATE CASCADE
+    cart_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id, order_id, product_id) REFERENCES CartItems(user_id, order_id, product_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (rid)
 );
 
