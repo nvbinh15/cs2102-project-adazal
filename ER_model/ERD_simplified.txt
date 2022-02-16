@@ -1,25 +1,23 @@
-[Shops](sid*);
-[Products](pid*);
-[Manufacturers](mid*);
-[Categories](cid*);
-[Employees](eid*);
-[Users](uid*);
-[Orders](order_id*);
-[Refunds](rid*);
-[Coupons](cid*);
-
-[Complaints](cid*);
+[Shops](sid*, name);
+[Products](pid*, name, description, price, quantity);
+[Manufacturers](mid* , name, country);
+[Categories](cid*, name);
+[Employees](eid*, name, monthly_salary);
+[Users](uid*, name, address, is_deleted);
+[Orders](order_id*, total_cost, shipping_address);
+[Refunds](rid*, quantity);
+[Coupons](cid*, reward, validity_period, minimum_order_value);
+[Complaints](cid*, status);
 [ShopComplaints]();
 [CommentComplaints]();
 [OrderComplaints]();
 [CartItemComplaints]();
+[[CartItems]](cid*, shipping_cost, delivery_date, status, estimated_delivery_date, quantity);
 
-[[CartItems]](cid*);
-
-[<Comments>]();
-<Replies>();
-[<ArchivedComments>](created_timestamp*);
-<ArchivedReplies>(created_timestamp*);
+[<Comments>](content, rating, created_timestamp);
+<Replies>(content, created_timestamp);
+[<ArchivedComments>](content, rating, created_timestamp*);
+<ArchivedReplies>(content, created_timestamp*);
 <ParentCategory>();
 <<Includes>>();
 <Sells>();
@@ -27,8 +25,8 @@
 <Produces>();
 <BelongsTo>();
 <Requests>(date);
-<HandlesRefunds>();
-[<Rewarded>]();
+<HandlesRefunds>(status, reason_of_rejection, processed_date);
+[<Rewarded>](issued_date, quantity);
 <Applies>();
 [<Files>]();
 <AboutShops>();
