@@ -1,0 +1,115 @@
+[Shops](sid*);
+[[Products]](pid*);
+[Manufacturers](mid*);
+[Categories](cid*);
+[Employees](edi*);
+[Users](uid*);
+[[Orders]](order_id*);
+[Refunds](rid*);
+[Coupons](cid*);
+
+[Complaints](cid*);
+[ShopComplaints]();
+[CommentComplaints]();
+[OrderComplaints]();
+[CartItemComplaints]();
+
+
+[[CartItems]](cid*);
+
+[<Comments>]();
+<Replies>();
+[<ArchivedComments>](created_timestamp*);
+<ArchivedReplies>(created_timestamp*);
+
+<ParentCategory>();
+<<Includes>>();
+<<Sells>>();
+<<Places>>();
+<Produces>();
+<BelongsTo>();
+<Requests>(date);
+<HandlesRefunds>();
+<Rewarded>();
+<Applies>();
+[<Files>]();
+<AboutShops>();
+<AboutComments>();
+<AboutOrders>();
+<AboutCartItems>();
+
+<HandlesComplaints>();
+
+<For>();
+<Of>();
+
+Shops --- Sells;
+Products ==> Sells;
+
+
+Orders === Includes;
+
+CartItems ==> Includes;
+
+Users --> Comments;
+CartItems --- Comments;
+Users --- Replies;
+Comments --- Replies;
+
+
+Users --- ArchivedComments;
+CartItems --- ArchivedComments;
+Users --- ArchivedReplies;
+ArchivedComments --- ArchivedReplies;
+
+
+Manufacturers --- Produces;
+Products ==> Produces;
+
+Categories --> ParentCategory;
+Categories --- ParentCategory;
+
+Categories --- BelongsTo;
+Products === BelongsTo;
+
+Users --- Places;
+Orders ==> Places;
+
+Users --- Requests;
+Refunds --- Requests;
+
+Refunds === For;
+
+CartItems --- For;
+
+CartItems ==> Of;
+Products ==> Of;
+
+Employees --- HandlesRefunds;
+Refunds ==> HandlesRefunds;
+
+Users --- Rewarded;
+Coupons --- Rewarded;
+
+Users --- Applies;
+Coupons --> Applies;
+Orders --- Applies;
+
+Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints, CartItemComplaints};
+Users --- Files;
+Complaints --- Files;
+
+ShopComplaints --- AboutShops;
+Shops --- AboutShops;
+
+OrderComplaints --- AboutOrders;
+Orders --- AboutOrders;
+
+CommentComplaints --- AboutComments;
+Comments --- AboutComments;
+
+CartItemComplaints --- AboutCartItems;
+CartItems --- AboutCartItems;
+
+Employees --- HandlesComplaints;
+Files ==> HandlesComplaints;
