@@ -1,11 +1,8 @@
 DROP TABLE IF EXISTS
-Shops, Products, Manufacturers, Categories,
-Employees, Users, Orders, CartItems, Comments, 
-ArchivedComments, Replies, ArchivedReplies, Refunds,
-Requests, HandlesRefunds, Coupons, Rewarded, Applies,
-Complaints, CartItemComplaints, AboutCartItems, ShopComplaints,
-AboutShops, OrderComplaints, AboutOrders, CommentComplaints,
-AboutComments, Files, HandlesComplaints;
+Shops, Products, Manufacturers, Categories, Employees, Users, Orders, CartItems, Comments, 
+ArchivedComments, Replies, ArchivedReplies, Refunds, Requests, HandlesRefunds, Coupons, Rewarded, 
+Applies, Complaints, CartItemComplaints, AboutCartItems, ShopComplaints, AboutShops, OrderComplaints, 
+AboutOrders, CommentComplaints, AboutComments, Files, HandlesComplaints;
 
 CREATE TABLE Shops (
     sid INTEGER PRIMARY KEY,
@@ -134,7 +131,7 @@ CREATE TABLE ArchivedRatings (
     REFERENCES CartItems (user_id, order_id, shop_id, product_id) ON UPDATE CASCADE,
     PRIMARY KEY (user_id, shop_id, product_id, created_timestamp)
     -- not on delete cascade to archive the data
-)
+);
 
 CREATE TABLE Comments (
     user_id INTEGER NOT NULL,
