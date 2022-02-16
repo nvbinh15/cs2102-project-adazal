@@ -2,7 +2,7 @@
 [Products](pid*);
 [Manufacturers](mid*);
 [Categories](cid*);
-[Employees](edi*);
+[Employees](eid*);
 [Users](uid*);
 [Orders](order_id*);
 [Refunds](rid*);
@@ -14,14 +14,12 @@
 [OrderComplaints]();
 [CartItemComplaints]();
 
-
 [[CartItems]](cid*);
 
 [<Comments>]();
 <Replies>();
 [<ArchivedComments>](created_timestamp*);
 <ArchivedReplies>(created_timestamp*);
-
 <ParentCategory>();
 <<Includes>>();
 <Sells>();
@@ -37,18 +35,15 @@
 <AboutComments>();
 <AboutOrders>();
 <AboutCartItems>();
-
 <HandlesComplaints>();
-
 <For>();
 <<Of>>();
+
 
 Shops --- Sells;
 Products ==> Sells;
 
-
 Orders --- Includes;
-
 CartItems ==> Includes;
 
 Users --- Comments;
@@ -56,12 +51,10 @@ CartItems --- Comments;
 Users --- Replies;
 Comments --- Replies;
 
-
 Users --- ArchivedComments;
 CartItems --- ArchivedComments;
 Users --- ArchivedReplies;
 ArchivedComments --- ArchivedReplies;
-
 
 Manufacturers --- Produces;
 Products ==> Produces;
@@ -79,7 +72,6 @@ Users --- Requests;
 Refunds === Requests;
 
 Refunds === For;
-
 CartItems --- For;
 
 CartItems ==> Of;
@@ -98,16 +90,16 @@ Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints, CartItemComp
 Users --- Files;
 Complaints --- Files;
 
-ShopComplaints --- AboutShops;
+ShopComplaints ==> AboutShops;
 Shops --- AboutShops;
 
-OrderComplaints --- AboutOrders;
+OrderComplaints ==> AboutOrders;
 Orders --- AboutOrders;
 
-CommentComplaints --- AboutComments;
+CommentComplaints ==> AboutComments;
 Comments --- AboutComments;
 
-CartItemComplaints --- AboutCartItems;
+CartItemComplaints ==> AboutCartItems;
 CartItems --- AboutCartItems;
 
 Employees --- HandlesComplaints;

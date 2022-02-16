@@ -1,73 +1,63 @@
-[Shops](sid*, name);
-[[Products]](pid*, name, description, price, quantity);
-[Manufacturers](mid* , name, country);
-[Categories](cid*, name);
-[Employees](edi*, name, monthly_salary);
-[Users](uid*, name, address, is_deleted);
-[[Orders]](order_id*, total_cost, shipping_address, status, estimated_delivery_date);
+[Shops](sid*);
+[Products](pid*);
+[Manufacturers](mid*);
+[Categories](cid*);
+[Employees](eid*);
+[Users](uid*);
+[Orders](order_id*);
 [Refunds](rid*);
-[Coupons](cid*, reward, validity_period, minimum_order_value);
-
-[Complaints](cid*, status);
+[Coupons](cid*);
+[Complaints](cid*);
 [ShopComplaints]();
 [CommentComplaints]();
 [OrderComplaints]();
 [CartItemComplaints]();
+[[CartItems]](cid*);
 
-
-[[CartItems]](cid*, shipping_cost, delivery_date);
-
-[<Comments>](content, rating, created_timestamp);
-<Replies>(content, created_timestamp);
-[<ArchivedComments>](content, rating, created_timestamp*);
-<ArchivedReplies>(content, created_timestamp*);
-
+[<Comments>]();
+<Replies>();
+[<ArchivedComments>](created_timestamp*);
+<ArchivedReplies>(created_timestamp*);
 <ParentCategory>();
 <<Includes>>();
-<<Sells>>();
-<<Places>>();
+<Sells>();
+<Places>();
 <Produces>();
 <BelongsTo>();
 <Requests>(date);
-<HandlesRefunds>(status, reason_of_rejection, processed_date);
-<Rewarded>(issued_date, quantity);
+<HandlesRefunds>();
+[<Rewarded>]();
 <Applies>();
 [<Files>]();
 <AboutShops>();
 <AboutComments>();
 <AboutOrders>();
 <AboutCartItems>();
-
 <HandlesComplaints>();
-
 <For>();
-<Of>();
+<<Of>>();
 
 Shops --- Sells;
 Products ==> Sells;
 
-
-Orders === Includes;
-
+Orders --- Includes;
 CartItems ==> Includes;
 
-Users --> Comments;
+Users --- Comments;
 CartItems --- Comments;
 Users --- Replies;
 Comments --- Replies;
-
 
 Users --- ArchivedComments;
 CartItems --- ArchivedComments;
 Users --- ArchivedReplies;
 ArchivedComments --- ArchivedReplies;
 
-
 Manufacturers --- Produces;
 Products ==> Produces;
 
-Categories --> ParentCategory;
-Categories --- ParentCategory;
+Categories --> ParentCategory [Parent];
+Categories --- ParentCategory [Child];
 
 Categories --- BelongsTo;
 Products === BelongsTo;
@@ -76,14 +66,14 @@ Users --- Places;
 Orders ==> Places;
 
 Users --- Requests;
-Refunds --- Requests;
+Refunds === Requests;
 
 Refunds === For;
 
 CartItems --- For;
 
 CartItems ==> Of;
-Products ==> Of;
+Products --- Of;
 
 Employees --- HandlesRefunds;
 Refunds ==> HandlesRefunds;
@@ -91,24 +81,23 @@ Refunds ==> HandlesRefunds;
 Users --- Rewarded;
 Coupons --- Rewarded;
 
-Users --- Applies;
-Coupons --> Applies;
+Rewarded --- Applies;
 Orders --- Applies;
 
 Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints, CartItemComplaints};
 Users --- Files;
 Complaints --- Files;
 
-ShopComplaints --- AboutShops;
+ShopComplaints ==> AboutShops;
 Shops --- AboutShops;
 
-OrderComplaints --- AboutOrders;
+OrderComplaints ==> AboutOrders;
 Orders --- AboutOrders;
 
-CommentComplaints --- AboutComments;
+CommentComplaints ==> AboutComments;
 Comments --- AboutComments;
 
-CartItemComplaints --- AboutCartItems;
+CartItemComplaints ==> AboutCartItems;
 CartItems --- AboutCartItems;
 
 Employees --- HandlesComplaints;
