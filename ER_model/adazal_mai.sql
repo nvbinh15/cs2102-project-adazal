@@ -80,10 +80,10 @@ CREATE TABLE HandleRefunds (
     rid INTEGER REFERENCES Refunds,
     eid INTEGER REFERENCES Employees,
     status TEXT CHECK (status IN ('processing', 'accepted', 'rejected')),
-    date_of_acceptance DATE,
-    date_of rejection DATE,
+    processed_date DATE,
     reason_of_rejection TEXT,
-    PRIMARY KEY (rid, eid)
+    PRIMARY KEY (rid, eid),
+    CHECK ((reason_of_rejection IS NULL) OR (status = 'rejected'))
 );
 
 CREATE TABLE Refunds (
@@ -97,6 +97,85 @@ CREATE TABLE Refunds (
         CHECK (quantity >= 0)
     FOREIGN KEY (pid, sid, order_id) REFERENCES CartItems,
 ); --cannot capture request_date within 30 CartItems date, Refunds.quantity <= CartItems.quantity (TRIGGERS)
+
+CREATE TABLE Comments (
+    uid INTEGER REFERENCES Users
+        ON UPDATE CASCADE,
+    pid INTEGER
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    sid INTEGER
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    order_id INTEGER,
+    content TEXT,
+    rating INTEGER 
+        CHECK (rating in (1,2,3,4,5)),
+    created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (uid, pid, sid, order_id),
+    FOREIGN KEY (pid, sid, order_id) REFERENCES CartItems
+    
+) -- cannot capture Each time a user purchases a product from a shop
+
+CREATE TABLE ArchivedComments (
+    uid INTEGER REFERENCES Users,
+    pid INTEGER,
+    sid INTEGER,
+    order_id INTEGER,
+    content TEXT,
+    rating INTEGER 
+        CHECK (rating in (1,2,3,4,5)),
+    created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (uid, pid, sid, order_id),
+    FOREIGN KEY (pid, sid, order_id) REFERENCES CartItems
+)
+
+CREATE TABLE Replies (
+    user1_id INTEGER REFERENCES Users ON UPDATE CASCADE,
+    shop_id INTEGER REFERENCES Shops ON DELETE CASCADE ON UPDATE CASCADE,
+    product_id INTEGER REFERENCES Products ON DELETE CASCADE ON UPDATE CASCADE,
+    user2_id INTEGER REFERENCES Users ON UPDATE CASCADE,
+    content TEXT,
+    created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user1_id, shop_id, product_id, user2_id, created_timestamp)
+); -- created_timestamps should also be part of PK
+
+CREATE TABLE ArchivedReplies (
+    user1_id INTEGER REFERENCES Users ON UPDATE CASCADE,
+    shop_id INTEGER REFERENCES Products ON UPDATE CASCADE,
+    product_id INTEGER REFERENCES Products ON UPDATE CASCADE,
+    user2_id INTEGER REFERENCES Users ON UPDATE CASCADE,
+    content TEXT,
+    created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user1_id, shop_id, product_id, user2_id, created_timestamp)
+); 
+
+/*
+Note ER diagram:
+1) CartItems must have quantity
+2) Order don’t have estimated deli date
+3) Employee: edi -> eid
+4) Refunds: request_date, quantity
+5) Refunds -> Users: total participation
+6) User -> Comments/Replies: key constraint
+7) Comments/Replies/Archived.. -> User: total participation
+8) User – Replies – Comments: created_time_stamps part of PK (can replies many)
+
+
+Constraints ignored by ER: 
+1) The effects of coupons are ignored during product refunds
+2) Request date within 30 days refund
+
+
+
+
+Constraints ignored by schema:
+1) “Each time a user purchases a product from a shop”: can only comment/rate after purchase
+2) Request date within 30 days refund
+3) Refund quantity <= CartItems quantity
+
+*/
+
 
 
 
