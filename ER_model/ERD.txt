@@ -1,0 +1,104 @@
+[Shops](sid*, name);
+[Products](pid*, name, description, price, quantity);
+[Manufacturers](mid* , name, country);
+[Categories](cid*, name);
+[Employees](eid*, name, monthly_salary);
+[Users](uid*, name, address, is_deleted);
+[Orders](order_id*, total_cost, shipping_address);
+[Refunds](rid*, quantity, date);
+[Coupons](cid*, reward, validity_period, minimum_order_value);
+[Complaints](cid*, status);
+[ShopComplaints]();
+[CommentComplaints]();
+[OrderComplaints]();
+[CartItemComplaints]();
+[[CartItems]](cid*, shipping_cost, delivery_date, status, estimated_delivery_date, quantity);
+
+[<Comments>](content, rating, created_timestamp);
+<Replies>(content, created_timestamp);
+[<ArchivedComments>](content, rating, created_timestamp*);
+<ArchivedReplies>(content, created_timestamp*);
+<ParentCategory>();
+<<Includes>>();
+<Sells>();
+<Places>();
+<Produces>();
+<BelongsTo>();
+<Requests>();
+<HandlesRefunds>(status, reason_of_rejection, processed_date);
+[<Rewarded>](issued_date, quantity);
+<Applies>();
+[<Files>]();
+<AboutShops>();
+<AboutComments>();
+<AboutOrders>();
+<AboutCartItems>();
+<HandlesComplaints>();
+<For>();
+<<Of>>();
+
+
+Shops --- Sells;
+Products ==> Sells;
+
+Orders --- Includes;
+CartItems ==> Includes;
+
+Users --- Comments;
+CartItems --- Comments;
+Users --- Replies;
+Comments --- Replies;
+
+Users --- ArchivedComments;
+CartItems --- ArchivedComments;
+Users --- ArchivedReplies;
+ArchivedComments --- ArchivedReplies;
+
+Manufacturers --- Produces;
+Products ==> Produces;
+
+Categories --> ParentCategory [Parent];
+Categories --- ParentCategory [Child];
+
+Categories --- BelongsTo;
+Products === BelongsTo;
+
+Users --- Places;
+Orders ==> Places;
+
+Users --- Requests;
+Refunds === Requests;
+
+Refunds === For;
+CartItems --- For;
+
+CartItems ==> Of;
+Products --- Of;
+
+Employees --- HandlesRefunds;
+Refunds ==> HandlesRefunds;
+
+Users --- Rewarded;
+Coupons --- Rewarded;
+
+Rewarded --- Applies;
+Orders --> Applies;
+
+Complaints ==> {ShopComplaints, OrderComplaints, CommentComplaints, CartItemComplaints};
+Users --- Files;
+Complaints --- Files;
+
+ShopComplaints ==> AboutShops;
+Shops --- AboutShops;
+
+OrderComplaints ==> AboutOrders;
+Orders --- AboutOrders;
+
+CommentComplaints ==> AboutComments;
+Comments --- AboutComments;
+
+CartItemComplaints ==> AboutCartItems;
+CartItems --- AboutCartItems;
+
+Employees --- HandlesComplaints;
+Files ==> HandlesComplaints;
