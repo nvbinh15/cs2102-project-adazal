@@ -55,7 +55,6 @@ CREATE TABLE CartItems (
     order_id INTEGER REFERENCES Order
         ON DELETE CASCADE,
     pid INTEGER,
-    sid INTEGER,
     quantity INTEGER 
         CHECK (quantity >= 0),
     shipping_cost INTEGER 
@@ -63,8 +62,8 @@ CREATE TABLE CartItems (
     estimated_delivery_date DATE, --diff
     status TEXT DEFAULT "being processed"
         CHECK (status in ("being processed", "shipped", "delivered")),
-    PRIMARY KEY (pid, sid, order_id),
-    FOREIGN KEY (pid, sid) REFERENCES Products
+    PRIMARY KEY (pid, order_id),
+    FOREIGN KEY (pid) REFERENCES Products
 );
 
 CREATE TABLE Orders (
@@ -73,7 +72,7 @@ CREATE TABLE Orders (
     shipping_address TEXT,
     total_cost NUMERIC 
         CHECK (total_cost >= 0),
-    PRIMARY KEY (order_id, uid)
+    PRIMARY KEY (order_id)
 );
 
 CREATE TABLE HandleRefunds (
