@@ -132,26 +132,46 @@ CREATE OR REPLACE FUNCTION view_comments(shop_id INTEGER, product_id INTEGER, se
 RETURNS TABLE (username TEXT, content TEXT, rating INTEGER, comment_timestamp TIMESTAMP) AS $$
 DECLARE
     curs CURSOR FOR (
-        WITH RECURSIVE related_comments(username, comment_id, content, rating, comment_timestamp) AS (
-            SELECT U.name, C.id, RV.content, RV.rating, RV.review_timestamp
+        WITH RECURSIVE related_comments(username, account_closed, comment_id, content, rating, comment_timestamp) AS (
+            SELECT U.name, U.account_closed, C.id, RV.content, RV.rating, RV.review_timestamp
             FROM users U, comment C, review R, review_version RV 
             WHERE R.shop_id = shop_id AND R.product_id = product_id AND R.sell_timestamp = sell_timestamp
                 AND R.id = C.id AND C.user_id = U.id 
-                AND R.id = RV.id
+                AND R.id = RV.id AND RV.review_timestamp >= ALL (
+                    SELECT review_timestamp
+                    FROM review_version
+                    WHERE review_id = RV.id 
+                )
             
             UNION ALL 
 
-            SELECT U.name, C.id, RV.content, RV.rating, RV.review_timestamp
+            SELECT U.name, U.account_closed, C.id, RV.content, NULL, RV.review_timestamp
             FROM users U, comment C, reply R, reply_version RV 
             JOIN related_comments RC 
             ON RC.comment_id = R.other_comment_id
             WHERE R.id = C.id AND C.user_id = U.id AND R.id = RV.id
+                AND RV.reply_timestamp >= ALL (
+                    SELECT reply_timestamp
+                    FROM reply_version 
+                    WHERE reply_id = RV.id
+                )
         ) 
-        SELECT * FROM related_comments ORDER BY comment_timestamp
+        SELECT * FROM related_comments ORDER BY comment_timestamp, comment_id
     );
+    r RECORD;
 BEGIN
+    OPEN curs;
+    LOOP
+        FETCH curs INTO r;
+        EXIT WHEN NOT FOUND;
 
+        IF r.account_closed = TRUE THEN username := "A deleted user";
+        END IF;
 
+        RETURN NEXT;
+    END LOOP;
+
+    CLOSE curs;
     RETURN;
 END;
 $$ LANGUAGE plpgsql;
