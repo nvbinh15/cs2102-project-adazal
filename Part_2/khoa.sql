@@ -60,11 +60,11 @@ DECLARE
 BEGIN 
     SELECT Rv.id INTO review_id
     FROM review Rv
-    WHERE R.id = NEW.id;
+    WHERE Rv.id = NEW.id;
 
     SELECT Rp.id INTO reply_id
     FROM reply Rp
-    WHERE R.id = NEW.id;
+    WHERE Rp.id = NEW.id;
 
     IF review_id IS NULL AND reply_id IS NULL THEN 
         RETURN NULL;
@@ -134,3 +134,28 @@ CREATE CONSTRAINT TRIGGER insert_review_version
 AFTER INSERT ON review
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW EXECUTE FUNCTION check_review_version();
+
+-- 2.2.(2)
+CREATE OR REPLACE FUNCTION get_most_returned_products_from_manufacturer(IN manufacturer_id INTEGER, IN n INTEGER)
+RETURNS TABLE(product_id INTEGER, product_name TEXT, return_rate NUMERIC(3, 2)) AS $$
+DECLARE
+    curs CURSOR FOR (SELECT P.id, P.name, coalesce(Re.rate, 0)
+                    FROM product P JOIN (SELECT R.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
+                    FROM (SELECT id, count(refund_status) as num_accept FROM refund_request WHERE status = 'accepted' GROUP BY product_id) R1 
+                    NATURAL JOIN (SELECT id, count(refund_status) as total_refund FROM refund_request GROUP BY product_id) R2) Re
+                    WHERE P.manufacturer = manufacturer_id
+                    ORDER BY rate DESC, P.id);
+    r1 RECORD;
+BEGIN 
+    OPEN curs;
+    FOR c in 1..n LOOP 
+        FETCH curs into r1;
+        EXIT WHEN NOT FOUND;
+        product_id := r1.id;
+        product_name := r1.name;
+        return_rate := r1.rate;
+        RETURN NEXT;
+    END LOOP; 
+    CLOSE curs;
+END;
+$$ LANGUAGE plpgsql;
