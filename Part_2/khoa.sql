@@ -142,7 +142,7 @@ DECLARE
     curs CURSOR FOR (SELECT P.id, P.name, coalesce(Re.rate, 0)
                     FROM product P JOIN (SELECT R.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
                     FROM (SELECT id, count(refund_status) as num_accept FROM refund_request WHERE status = 'accepted' GROUP BY product_id) R1 
-                    NATURAL JOIN (SELECT id, count(refund_status) as total_refund FROM refund_request GROUP BY product_id) R2) Re
+                    NATURAL JOIN (SELECT id, count(refund_status) as total_refund FROM refund_request GROUP BY product_id) R2) Re ON P.id = Re.id
                     WHERE P.manufacturer = manufacturer_id
                     ORDER BY rate DESC, P.id);
     r1 RECORD;
