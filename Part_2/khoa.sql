@@ -153,7 +153,7 @@ DECLARE
         ),
         product_rate AS (
             SELECT R1.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
-            FROM product_accept_rate R1 FULL OUTER JOIN product_total R2 ON R1.id = R2.id
+            FROM product_accept_rate R1 NATURAL JOIN product_total R2 ON R1.id = R2.id
         )
         SELECT P.id, P.name, coalesce(Re.rate, 0)
         FROM product P FULL OUTER JOIN product_rate R ON P.id = R.id
