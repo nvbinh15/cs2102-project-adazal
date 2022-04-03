@@ -139,12 +139,27 @@ FOR EACH ROW EXECUTE FUNCTION check_review_version();
 CREATE OR REPLACE FUNCTION get_most_returned_products_from_manufacturer(IN manufacturer_id INTEGER, IN n INTEGER)
 RETURNS TABLE(product_id INTEGER, product_name TEXT, return_rate NUMERIC(3, 2)) AS $$
 DECLARE
-    curs CURSOR FOR (SELECT P.id, P.name, coalesce(Re.rate, 0)
-                    FROM product P JOIN (SELECT R.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
-                    FROM (SELECT id, count(refund_status) as num_accept FROM refund_request WHERE status = 'accepted' GROUP BY product_id) R1 
-                    NATURAL JOIN (SELECT id, count(refund_status) as total_refund FROM refund_request GROUP BY product_id) R2) Re ON P.id = Re.id
-                    WHERE P.manufacturer = manufacturer_id
-                    ORDER BY rate DESC, P.id);
+    curs CURSOR FOR (
+        WITH product_accept_rate AS (
+            SELECT id, count(refund_status) as num_accept
+            FROM refund_request
+            WHERE status = 'accepted' 
+            GROUP BY product_id
+        ),
+        product_total AS (
+            SELECT id, count(refund_status) as total_refund
+            FROM refund_request
+            GROUP BY product_id
+        ),
+        product_rate AS (
+            SELECT R1.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
+            FROM product_accept_rate R1 NATURAL JOIN product_total R2
+        )
+        SELECT P.id, P.name, coalesce(Re.rate, 0)
+        FROM product P JOIN product_rate R ON P.id = R.id
+        WHERE P.manufacturer = manufacturer_id
+        ORDER BY rate DESC, P.id
+    );
     r1 RECORD;
 BEGIN 
     OPEN curs;
