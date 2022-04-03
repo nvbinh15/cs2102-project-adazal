@@ -100,7 +100,7 @@ CREATE CONSTRAINT TRIGGER check_type_complaint
 AFTER INSERT ON complaint 
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW 
-EXECUTE FUNCTION check_delivery_complaint();
+EXECUTE FUNCTION check_type_complaint();
 
 
 -- 2.1 (2) 
