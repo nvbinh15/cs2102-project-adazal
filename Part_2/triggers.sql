@@ -12,12 +12,12 @@ BEGIN
     num_of_products := (
         SELECT COUNT(*)
         FROM Sells S
-        WHERE S.product_id = OLD.id
+        WHERE S.product_id = NEW.id
     );
     IF num_of_products < 1 THEN
         RETURN NULL;
     END IF;
-    RETURN OLD;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -37,12 +37,12 @@ BEGIN
     num_of_products := (
         SELECT COUNT(*)
         FROM Orderline O
-        WHERE O.order_id = OLD.id
+        WHERE O.order_id = NEW.id
     );
     IF num_of_products < 1 THEN
         RETURN NULL;
     END IF;
-    RETURN OLD;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -61,21 +61,24 @@ DECLARE
     minimum_amount INTEGER;
     total_amount INTEGER;
 BEGIN
+    IF NEW.coupon_id IS NULL THEN 
+        RETURN NEW;
+    END IF;
     minimum_amount := (
         SELECT C.min_order_amount
         FROM Coupon_batch C
-        WHERE C.id = OLD.coupon_id
+        WHERE C.id = NEW.coupon_id
     );
     total_amount := (
-        SELECT SUM(O.quantity * S.price)
+        SELECT SUM(O.quantity * S.price + O.shipping_cost)
         FROM Orderline O JOIN Sells S
         ON ROW(O.shop_id, O.product_id, O.sell_timestamp) = ROW(S.shop_id, S.product_id, S.sell_timestamp)
-        WHERE O.order_id = OLD.id
+        WHERE O.order_id = NEW.id
     );
     IF total_amount <= minimum_amount THEN
         RETURN NULL;
     END IF;
-    RETURN OLD;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
