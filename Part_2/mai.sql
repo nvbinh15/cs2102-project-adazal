@@ -125,27 +125,30 @@ RETURNS TABLE(shop_id INTEGER, shop_name TEXT, num_negative_indicators INTEGER) 
 
 DECLARE 
   curs CURSOR FOR (
-    select S.shop_id, S.shop_name, (Negative1.count_refund + Negative2.count_shop_complaint + Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
-    from (select R.shop_id, count(*) as count_refund
+    select S.id, S.name, (Negative1.count_refund + Negative2.count_shop_complaint +
+     Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
+    from shop S, (select R.shop_id, count(*) as count_refund
           from refund_request R 
-          group by (R.order_id, R.shop_id, R.product_id, R.sell_timestamp)) Negative1,
+          group by (R.order_id, R.shop_id, R.product_id, R.sell_timestamp)) as Negative1,
 
           (select C.shop_id, count(*) as count_shop_complaint
-          from shop_complaint C) Negative2,
+          from shop_complaint C
+          group by (C.shop_id)) Negative2,
 
           (select C.shop_id, count(*) as count_delivery_complaint
           from delivery_complaint C 
-          group by (C.order_id, C.shop_id, C.product_id, C.sell_timestamp)) Negative3,
+          group by (C.order_id, C.shop_id, C.product_id, C.sell_timestamp)) as Negative3,
 
-          (select R.shop_id, RV.count(*) as count_bad_review 
+          (select R.shop_id, count(*) as count_bad_review 
           from review R, review_version RV 
           where R.id = RV.review_id and RV.rating = 1 and 
-              RV.review_timestamp >= ALL (select review_timestamp from review_version)) Negative4,
-          shop S 
-    where Negative1.shop_id = S.shop_id and Negative2.shop_id = S.shop_id and Negative3.shop_id = S.shop_id and Negative4 = S.shop_id 
-    order by count_negative_indicators DESC 
-    limit n
-  );
+              RV.review_timestamp >= ALL (select review_timestamp from review_version)
+          group by(R.shop_id)) as Negative4
+      
+        where Negative1.shop_id = S.id and Negative2.shop_id = S.id and Negative3.shop_id = S.id and Negative4.shop_id = S.id 
+        order by count_negative_indicators DESC 
+        limit n
+      );
   r RECORD;
 
 BEGIN 
