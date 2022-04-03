@@ -60,7 +60,7 @@ FOR EACH ROW EXECUTE FUNCTION check_refund_quantity();
 
 
 -- 1.(5)
-CREATE OR REPLACE FUNCTION check_reund_request_date()
+CREATE OR REPLACE FUNCTION check_refund_request_date()
 RETURNS TRIGGER AS $$
 DECLARE 
     last_valid_date DATE;
@@ -84,7 +84,7 @@ DROP TRIGGER IF EXISTS refund_request_date ON refund_request;
 
 CREATE TRIGGER refund_request_date
 BEFORE INSERT ON refund_request 
-FOR EACH ROW EXECUTE FUNCTION check_reund_request_date();
+FOR EACH ROW EXECUTE FUNCTION check_refund_request_date();
 
 -- 1.(6)
 CREATE OR REPLACE FUNCTION check_refund_delivered_product()
@@ -165,8 +165,14 @@ BEGIN
         FETCH curs INTO r;
         EXIT WHEN NOT FOUND;
 
-        IF r.account_closed = TRUE THEN username := "A deleted user";
+        IF r.account_closed = TRUE 
+            THEN username := "A Deleted User";
+            ELSE username := r.username;
         END IF;
+
+        content := r.content;
+        rating := r.rating;
+        comment_timestamp = r.comment_timestamp;
 
         RETURN NEXT;
     END LOOP;
