@@ -81,7 +81,7 @@ BEGIN
   from delivery_complaint C
   where C.id = OLD.id; 
 
-  if (is_shop or is_comment or is_delivery) then 
+  if (NOT (is_shop or is_comment or is_delivery)) then 
     RAISE EXCEPTION 'complaint is none of the type shop, comment, or delivery';
   elsif (is_shop and is_delivery) then 
     RAISE EXCEPTION 'complaint is both of type shop and delivery';
