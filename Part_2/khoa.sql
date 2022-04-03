@@ -67,9 +67,9 @@ BEGIN
     WHERE Rp.id = NEW.id;
 
     IF review_id IS NULL AND reply_id IS NULL THEN 
-        RETURN NULL;
+        RAISE EXCEPTION 'Comment is neither a review or reply';
     ELSIF review_id IS NOT NULL AND reply_id IS NOT NULL THEN 
-        RETURN NULL;
+        RAISE EXCEPTION 'Comment is both a review or reply';
     END IF;
 
     RETURN NEW;
@@ -90,7 +90,7 @@ DECLARE
     num_of_version INTEGER;
 BEGIN 
     num_of_version := 0;
-    SELECT count(R.reply_id) INTO num_of_version
+    SELECT count(*) INTO num_of_version
     FROM reply_version R 
     WHERE R.reply_id = NEW.id;
 
@@ -116,7 +116,7 @@ DECLARE
     num_of_version INTEGER;
 BEGIN 
     num_of_version := 0;
-    SELECT count(R.reply_id) INTO num_of_version
+    SELECT count(*) INTO num_of_version
     FROM reply_version R 
     WHERE R.reply_id = NEW.id;
 
