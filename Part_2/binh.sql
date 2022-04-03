@@ -165,8 +165,14 @@ BEGIN
         FETCH curs INTO r;
         EXIT WHEN NOT FOUND;
 
-        IF r.account_closed = TRUE THEN username := "A deleted user";
+        IF r.account_closed = TRUE 
+            THEN username := "A Deleted User";
+            ELSE username := r.username;
         END IF;
+
+        content := r.content;
+        rating := r.rating;
+        comment_timestamp = r.comment_timestamp;
 
         RETURN NEXT;
     END LOOP;
