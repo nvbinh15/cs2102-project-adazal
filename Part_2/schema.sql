@@ -141,7 +141,7 @@ CREATE TABLE reply_version (
     reply_timestamp TIMESTAMP,
     content TEXT,
     PRIMARY KEY (reply_id, reply_timestamp)
-);
+  );
 
 CREATE TABLE employee (
     id SERIAL PRIMARY KEY,
@@ -224,3 +224,4 @@ CREATE TABLE delivery_complaint (
     sell_timestamp TIMESTAMP NOT NULL,
     FOREIGN KEY (order_id, shop_id, product_id, sell_timestamp) REFERENCES orderline(order_id, shop_id, product_id, sell_timestamp)
 );
+
