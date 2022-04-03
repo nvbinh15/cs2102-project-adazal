@@ -5,5 +5,5 @@ CREATE OR REPLACE PROCEDURE place_order(
     shop_ids INTEGER[], product_ids INTEGER[], sell_timestamps TIMESTAMP[], 
     quantities INTEGER[], shipping_costs NUMERIC[]
 ) AS $$
-
+    
 $$ LANGUAGE plpgsql;
