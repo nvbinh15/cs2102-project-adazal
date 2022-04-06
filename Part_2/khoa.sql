@@ -81,12 +81,56 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION check_insert_reply()
+RETURNS TRIGGER as $$
+DECLARE 
+    review_id INTEGER;
+BEGIN 
+    SELECT Rv.id INTO review_id
+    FROM review Rv
+    WHERE Rv.id = NEW.id;
+
+    IF review_id IS NOT NULL THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION check_insert_review()
+RETURNS TRIGGER as $$
+DECLARE 
+    reply_id INTEGER;
+BEGIN 
+    SELECT Rp.id INTO review_id
+    FROM reply Rp
+    WHERE Rp.id = NEW.id;
+
+    IF reply_id IS NOT NULL THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 DROP TRIGGER IF EXISTS comment_is_either_reply_or_review ON comment;
+DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_reply ON reply;
+DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_review ON review;
 
 CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review 
 AFTER INSERT ON comment
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW EXECUTE FUNCTION check_comment();
+
+CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_reply 
+BEFORE INSERT ON reply
+FOR EACH ROW EXECUTE FUNCTION check_insert_reply();
+
+CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_review 
+BEFORE INSERT ON reivew
+FOR EACH ROW EXECUTE FUNCTION check_insert_review();
 -- Add trigger when insert into review and reply
 
 -- 1.(9)
