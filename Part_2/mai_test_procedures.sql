@@ -161,49 +161,49 @@ insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, 
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (8, 5, 8, '11/24/2021', 33, 58, 'Treeflex', '12/1/2021');
 
 -- comment
-insert into comment (id, user_id ) values (7, 7);
-insert into comment (id, user_id ) values (9, 9);
-insert into comment (id, user_id ) values (10, 2);
-insert into comment (id, user_id ) values (4, 2);
-insert into comment (id, user_id ) values (3, 7);
-insert into comment (id, user_id ) values (5, 4);
-insert into comment (id, user_id ) values (8, 2);
-insert into comment (id, user_id ) values (2, 4);
-insert into comment (id, user_id ) values (6, 10);
-insert into comment (id, user_id ) values (1, 2);
+-- insert into comment (id, user_id ) values (7, 7);
+-- insert into comment (id, user_id ) values (9, 9);
+-- insert into comment (id, user_id ) values (10, 2);
+-- insert into comment (id, user_id ) values (4, 2);
+-- insert into comment (id, user_id ) values (3, 7);
+-- insert into comment (id, user_id ) values (5, 4);
+-- insert into comment (id, user_id ) values (8, 2);
+-- insert into comment (id, user_id ) values (2, 4);
+-- insert into comment (id, user_id ) values (6, 10);
+-- insert into comment (id, user_id ) values (1, 2);
 
 --review
-insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (5, 9, 10, 14, '2021-04-12 13:40:58');
-insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (3, 3, 3, 3, '2022-01-17 03:29:03');
-insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (1, 9, 10, 3, '2021-11-17 10:04:13');
-insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (2, 4, 6, 6, '2021-04-06 20:43:27');
-insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (6, 14, 1, 9, '2021-05-23 23:09:20');
+-- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (5, 9, 10, 14, '2021-04-12 13:40:58');
+-- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (3, 3, 3, 3, '2022-01-17 03:29:03');
+-- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (1, 9, 10, 3, '2021-11-17 10:04:13');
+-- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (2, 4, 6, 6, '2021-04-06 20:43:27');
+-- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (6, 14, 1, 9, '2021-05-23 23:09:20');
 
 -- review_version
-insert into review_version (review_id, review_timestamp, content, rating) values (5, '2021-04-12 13:40:58', 'Biliary acute pancreatitis with uninfected necrosis', 1);
-insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-04-06 20:43:27', 'Toxic effect of tobacco and nicotine, accidental, subs', 3);
-insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-01-01 20:43:27', 'Major laceration of unsp internal jugular vein, subs encntr', 2);
-insert into review_version (review_id, review_timestamp, content, rating) values (1, '2021-11-17 10:04:13', 'Unsp fracture of lower end of unsp humerus, init for clos fx', 3);
-insert into review_version (review_id, review_timestamp, content, rating) values (6, '2021-05-23 23:09:20', 'Quad preg, unsp num plcnta & amnio sacs, third trimester', 1);
-insert into review_version (review_id, review_timestamp, content, rating) values (3, '2022-01-17 03:29:03', 'Legal intervention involving unspecified gas', 1);
-insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-01-02 20:43:27', 'Loose body in knee, left knee', 2);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (5, '2021-04-12 13:40:58', 'Biliary acute pancreatitis with uninfected necrosis', 1);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-04-06 20:43:27', 'Toxic effect of tobacco and nicotine, accidental, subs', 3);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-01-01 20:43:27', 'Major laceration of unsp internal jugular vein, subs encntr', 2);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (1, '2021-11-17 10:04:13', 'Unsp fracture of lower end of unsp humerus, init for clos fx', 3);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (6, '2021-05-23 23:09:20', 'Quad preg, unsp num plcnta & amnio sacs, third trimester', 1);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (3, '2022-01-17 03:29:03', 'Legal intervention involving unspecified gas', 1);
+-- insert into review_version (review_id, review_timestamp, content, rating) values (2, '2021-01-02 20:43:27', 'Loose body in knee, left knee', 2);
 
 
 -- reply
-insert into reply (id, other_comment_id) values (4, 1);
-insert into reply (id, other_comment_id) values (7, 4);
-insert into reply (id, other_comment_id) values (8, 2);
-insert into reply (id, other_comment_id) values (9, 4);
-insert into reply (id, other_comment_id) values (10, 5);
+-- insert into reply (id, other_comment_id) values (4, 1);
+-- insert into reply (id, other_comment_id) values (7, 4);
+-- insert into reply (id, other_comment_id) values (8, 2);
+-- insert into reply (id, other_comment_id) values (9, 4);
+-- insert into reply (id, other_comment_id) values (10, 5);
 
 -- reply_version
-insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-04-12 13:40:58', 'Biliary acute pancreatitis with uninfected necrosis');
-insert into reply_version (reply_id, reply_timestamp, content) values (7, '2021-04-06 20:43:27', 'Toxic effect of tobacco and nicotine, accidental, subs');
-insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-01-01 20:43:27', 'Major laceration of unsp internal jugular vein, subs encntr');
-insert into reply_version (reply_id, reply_timestamp, content) values (8, '2021-11-17 10:04:13', 'Unsp fracture of lower end of unsp humerus, init for clos fx');
-insert into reply_version (reply_id, reply_timestamp, content) values (9, '2021-05-23 23:09:20', 'Quad preg, unsp num plcnta & amnio sacs, third trimester');
-insert into reply_version (reply_id, reply_timestamp, content) values (10, '2022-01-17 03:29:03', 'Legal intervention involving unspecified gas');
-insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-01-02 20:43:27', 'Loose body in knee, left knee');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-04-12 13:40:58', 'Biliary acute pancreatitis with uninfected necrosis');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (7, '2021-04-06 20:43:27', 'Toxic effect of tobacco and nicotine, accidental, subs');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-01-01 20:43:27', 'Major laceration of unsp internal jugular vein, subs encntr');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (8, '2021-11-17 10:04:13', 'Unsp fracture of lower end of unsp humerus, init for clos fx');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (9, '2021-05-23 23:09:20', 'Quad preg, unsp num plcnta & amnio sacs, third trimester');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (10, '2022-01-17 03:29:03', 'Legal intervention involving unspecified gas');
+-- insert into reply_version (reply_id, reply_timestamp, content) values (4, '2021-01-02 20:43:27', 'Loose body in knee, left knee');
 
 -- employee
 insert into employee (id, name, salary) values (1, 'Emmalynne Haslewood', 851);
@@ -241,10 +241,10 @@ insert into shop_complaint (id, shop_id) values (6, 10);
 insert into shop_complaint (id, shop_id) values (1, 6);
 
 -- comment_complaint
-insert into comment_complaint (id, comment_id) values (2, 6);
-insert into comment_complaint (id, comment_id) values (3, 10);
-insert into comment_complaint (id, comment_id) values (8, 6);
-insert into comment_complaint (id, comment_id) values (7, 9);
+-- insert into comment_complaint (id, comment_id) values (2, 6);
+-- insert into comment_complaint (id, comment_id) values (3, 10);
+-- insert into comment_complaint (id, comment_id) values (8, 6);
+-- insert into comment_complaint (id, comment_id) values (7, 9);
 
 -- delivery_complaint
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (4, 15, 8, 11, '2021-10-07 20:37:57');

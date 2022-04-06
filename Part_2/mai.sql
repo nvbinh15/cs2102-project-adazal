@@ -105,11 +105,13 @@ EXECUTE FUNCTION check_type_complaint();
 
 -- 2.1 (2) 
 -- consideration:
--- - insert into empty comment table (it is the first comment) 
+-- - insert into empty comment table (it is the first comment): okay
 -- - review on the same product purchase (should remove the old review first): okay
--- - if remove old review (same product purchase) -> need to delete on comment table or not?
+-- - if remove old review (same product purchase) -> need to delete on comment table or not?: okay
 -- - orderline not exist (not sure if needs to check this?) 
 
+-- test for duplicate: call review(3, 4, 6, 6, '2021-04-06 20:43:27', 'hi', 1, '2022-04-07 20:43:27');
+-- test for new: call review(7, 9, 10, 19, '2022-02-25 14:48:35', 'hi not duplicate', 2, '2022-02-27 20:43:27');
 
 CREATE OR REPLACE PROCEDURE review( user_id INTEGER, order_id INTEGER, shop_id INTEGER, product_id INTEGER, sell_timestamp
 TIMESTAMP, content TEXT, rating INTEGER, comment_timestamp TIMESTAMP)
@@ -119,48 +121,33 @@ DECLARE
   a_shop_id alias for shop_id;
   a_product_id alias for product_id;
   a_sell_timestamp alias for sell_timestamp;
-
   comment_id INTEGER;
   is_duplicate BOOLEAN;
-  curs CURSOR FOR (select RV.review_id, RV.review_timestamp, RV.content, RV.rating  
-                  from review_version RV, review R 
-                  where RV.review_id = R.id and R.order_id = a_order_id and R.shop_id = a_shop_id
-                        and R.product_id = a_product_id and R.sell_timestamp = a_sell_timestamp);
-  r1 RECORD;
 
-BEGIN
-  OPEN curs;
-
-  select max(C.id) + 1 INTO comment_id from comment C;
-  insert into comment(id, user_id) values (comment_id, user_id); 
-  
+BEGIN  
   select (count(*) > 0) INTO is_duplicate from review R
   where R.order_id = a_order_id and R.shop_id = a_shop_id and R.product_id = a_product_id
         and R.sell_timestamp = a_sell_timestamp;
   
   IF is_duplicate THEN 
-    delete from review R where R.order_id = a_order_id and R.shop_id = a_shop_id and 
-                            R.product_id = a_product_id and R.sell_timestamp = a_sell_timestamp;
-    insert into review (id, order_id, shop_id , product_id, sell_timestamp) values 
-              (comment_id, order_id, shop_id, product_id, sell_timestamp);
+    -- if review for product purchase alr exists, just add the latest version to review_version,
+    -- no need to change comment and review table
+    select R.id into comment_id from review R
+    where R.order_id = a_order_id and R.shop_id = a_shop_id and R.product_id = a_product_id 
+        and R.sell_timestamp = a_sell_timestamp;
     insert into review_version (review_id, review_timestamp, content, rating) values 
                 (comment_id, comment_timestamp, content, rating);
-    LOOP 
-      FETCH curs INTO r1;
-      EXIT WHEN NOT FOUND;
-      insert into review_version (review_id, review_timestamp, content, rating) values 
-        (comment_id, r1.review_timestamp, r1.content, r1.rating); 
-    END LOOP;
-  
+
   ELSE 
+    -- if first time review, need to add into all comment + review + review_version table
+    select COALESCE(max(C.id) + 1, 1) INTO comment_id from comment C;
+    insert into comment(id, user_id) values (comment_id, user_id); 
     insert into review (id, order_id, shop_id , product_id, sell_timestamp) values 
                 (comment_id, order_id, shop_id, product_id, sell_timestamp);
     insert into review_version (review_id, review_timestamp, content, rating) values 
                 (comment_id, comment_timestamp, content, rating);
   END IF;
    
-  
- 
 END;
 $$ LANGUAGE plpgsql;
 
