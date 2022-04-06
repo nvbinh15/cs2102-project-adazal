@@ -161,7 +161,7 @@ DECLARE
             SELECT R1.product_id, ROUND(num_accept::decimal/total_refund, 2) as rate
             FROM product_accept_rate R1 NATURAL JOIN product_total R2
         )
-        SELECT P.id, P.name, coalesce(R.rate, 0) as rate
+        SELECT P.id, P.name, coalesce(R.rate, 0.00) as rate
         FROM product P FULL OUTER JOIN product_rate R ON P.id = R.product_id
         WHERE P.manufacturer = manufacturer_id
         ORDER BY rate DESC, P.id
