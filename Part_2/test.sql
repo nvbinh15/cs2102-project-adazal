@@ -105,11 +105,11 @@ insert into sells (shop_id, product_id, sell_timestamp, price, quantity) values 
 insert into sells (shop_id, product_id, sell_timestamp, price, quantity) values (6, 18, '2021-10-26 14:50:06', 420, 39);
 
 -- coupon_batch
-insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (1, '9/24/2021', '9/29/2021', 44, 90);
-insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (2, '5/11/2021', '2/6/2022', 26, 80);
-insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (3, '6/1/2021', '2/27/2022', 7, 55);
-insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (4, '6/3/2021', '1/3/2022', 23, 95);
-insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (5, '6/3/2021', '1/21/2022', 2, 64);
+insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (1, '24/9/2021', '29/9/2021', 44, 90);
+insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (2, '11/5/2021', '6/2/2022', 26, 80);
+insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (3, '1/6/2021', '27/2/2022', 7, 55);
+insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (4, '3/6/2021', '3/1/2022', 23, 95);
+insert into coupon_batch (id, valid_period_start, valid_period_end, reward_amount, min_order_amount) values (5, '3/6/2021', '21/1/2022', 2, 64);
 
 -- issued_coupon
 insert into issued_coupon (user_id, coupon_id) values (4, 2);
@@ -138,17 +138,22 @@ insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) v
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (15, 8, null, '26 Brickson Park Circle', 14);
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (16, 10, null, '8 Schlimgen Drive', 16);
 
+insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (17, 5, null, '8 Schlimgen Drive', 16);
+
 -- orderline
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 14, '2021-04-12 13:40:58', 96, 56, 'shipped', '12/17/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (15, 8, 11, '2021-10-07 20:37:57', 83, 48, 'delivered', '5/28/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (3, 3, 3, '2022-01-17 03:29:03', 93, 27, 'shipped', '5/11/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 3, '2021-11-17 10:04:13', 18, 31, 'shipped', '3/8/2022');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 19, '2022-02-25 14:48:35', 15, 23, 'shipped', '8/30/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (4, 6, 6, '2021-04-06 20:43:27', 94, 62, 'delivered', '11/18/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 14, '2021-04-12 13:40:58', 96, 56, 'shipped', '12/12/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (15, 8, 11, '2021-10-07 20:37:57', 83, 48, 'delivered', '28/5/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (3, 3, 3, '2022-01-17 03:29:03', 93, 27, 'shipped', '11/5/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 3, '2021-11-17 10:04:13', 18, 31, 'shipped', '8/3/2022');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 19, '2022-02-25 14:48:35', 15, 23, 'shipped', '30/8/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (4, 6, 6, '2021-04-06 20:43:27', 94, 62, 'delivered', '18/11/2021');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 2, 17, '2022-03-16 22:13:20', 25, 21, 'being_processed', null);
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (14, 1, 9, '2021-05-23 23:09:20', 36, 77, 'being_processed', null);
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 5, 6, '2021-12-01 04:25:38', 39, 61, 'shipped', '6/11/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '1/21/2022');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 5, 6, '2021-12-01 04:25:38', 39, 61, 'shipped', '11/6/2021');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '21/1/2022');
+
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (1, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '21/1/2022');
+insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (17, 10, 14, '2021-11-15 18:28:53', 42, 27, 'delivered', '21/1/2022');
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (8, 5, 1, '9/1/2021', 97, 4, 'Lotlux', '12/21/2021');
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 7, 13, '12/17/2021', 3, 33, 'Veribet', '9/30/2021');
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (5, 8, 8, '2/20/2022', 4, 29, 'Lotstring', '2/2/2022');
@@ -171,6 +176,8 @@ insert into comment (id, user_id ) values (8, 2);
 insert into comment (id, user_id ) values (2, 4);
 insert into comment (id, user_id ) values (6, 10);
 insert into comment (id, user_id ) values (1, 2);
+insert into comment (id, user_id) values (11, 3);
+insert into comment (id, user_id) values (12, 5);
 
 --review
 insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (5, 9, 10, 14, '2021-04-12 13:40:58');
@@ -219,9 +226,10 @@ insert into employee (id, name, salary) values (10, 'Joy Allchin', 89);
 
 -- refund_request
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (1, null, 15, 8, 11, '2021-10-07 20:37:57', 10, '3/3/2022', 'pending', null, null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (2, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '1/12/2022', 'being_handled', null, null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (3, 9, 6, 7, 11, '2021-11-15 18:28:53', 8, '6/9/2021', 'accepted', '6/10/2021', null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (4, 5, 4, 6, 6, '2021-04-06 20:43:27', 1, '1/1/2022','rejected', '1/24/2022', 'Sprain of medial collateral ligament of left knee');
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (2, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '12/1/2022', 'being_handled', null, null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (3, 9, 6, 7, 11, '2021-11-15 18:28:53', 8, '9/6/2021', 'accepted', '10/6/2021', null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (3, 9, 6, 7, 11, '2021-11-15 18:28:53', 8, '9/6/2021', null, '10/6/2021', null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (4, 5, 4, 6, 6, '2021-04-06 20:43:27', 1, '1/1/2022','rejected', '24/1/2022', 'Sprain of medial collateral ligament of left knee');
 
 -- complaint
 insert into complaint (id, content, status, user_id, handled_by) values (1, 'Nondisp commnt fx shaft of l femr, 7thK', 'pending', 9, null);
@@ -250,3 +258,5 @@ insert into comment_complaint (id, comment_id) values (7, 9);
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (4, 15, 8, 11, '2021-10-07 20:37:57');
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (5, 4, 6, 6, '2021-04-06 20:43:27');
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (10, 6, 7, 11, '2021-11-15 18:28:53');
+
+--
