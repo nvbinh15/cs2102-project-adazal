@@ -125,28 +125,33 @@ RETURNS TABLE(shop_id INTEGER, shop_name TEXT, num_negative_indicators INTEGER) 
 
 DECLARE 
   curs CURSOR FOR (
-    select S.id, S.name, (Negative1.count_refund + Negative2.count_shop_complaint +
-     Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
-    from shop S, (select R.shop_id, count(*) as count_refund
-          from refund_request R 
-          group by (R.order_id, R.shop_id, R.product_id, R.sell_timestamp)) as Negative1,
+    select S.id, S.name, (Negative1.count_refund + Negative2.count_shop_complaint + Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
 
-          (select C.shop_id, count(*) as count_shop_complaint
-          from shop_complaint C
-          group by (C.shop_id)) Negative2,
+    from shop S, (select S1.id, COALESCE((select count(*) from refund_request R 
+                                  where R.shop_id = S1.id 
+                                  group by (R.order_id, R.product_id, R.sell_timestamp)),0) count_refund
+                  from Shop S1) as Negative1,
+                  
+                  (select S1.id, COALESCE((select count(*) from shop_complaint C 
+                                    where C.shop_id = S1.id), 0) count_shop_complaint
+                  from Shop S1) as Negative2,
 
-          (select C.shop_id, count(*) as count_delivery_complaint
-          from delivery_complaint C 
-          group by (C.order_id, C.shop_id, C.product_id, C.sell_timestamp)) as Negative3,
+                  (select S1.id, COALESCE((select count(*) from delivery_complaint C 
+                                    where C.shop_id = S1.id
+                                    group by (C.order_id, C.product_id, C.sell_timestamp)), 0) count_delivery_complaint
+                  from Shop S1) as Negative3,
 
-          (select R.shop_id, count(*) as count_bad_review 
-          from review R, review_version RV 
-          where R.id = RV.review_id and RV.rating = 1 and 
-              RV.review_timestamp >= ALL (select review_timestamp from review_version)
-          group by(R.shop_id)) as Negative4
-      
-        where Negative1.shop_id = S.id and Negative2.shop_id = S.id and Negative3.shop_id = S.id and Negative4.shop_id = S.id 
-        order by count_negative_indicators DESC 
+                  (select S1.id, COALESCE((select count(*) from review R, review_version RV 
+                                    where R.shop_id = S1.id and R.id = RV.review_id and 
+                                    RV.rating = 1 and 
+                                    RV.review_timestamp >= ALL (select review_timestamp 
+                                                                from review_version RV1
+                                                                where RV1.review_id = R.id)), 0) count_bad_review
+                  from Shop S1) as Negative4
+
+        where Negative1.id = S.id and Negative2.id = S.id and Negative3.id = S.id and 
+              Negative4.id = S.id
+        order by count_negative_indicators DESC, id ASC
         limit n
       );
   r RECORD;
@@ -156,8 +161,8 @@ BEGIN
   LOOP 
     FETCH curs INTO r;
     EXIT WHEN NOT FOUND;
-    shop_id := r.shop_id;
-    shop_name := r.shop_name;
+    shop_id := r.id;
+    shop_name := r.name;
     num_negative_indicators := r.count_negative_indicators;
 
     RETURN NEXT;
