@@ -104,18 +104,63 @@ EXECUTE FUNCTION check_type_complaint();
 
 
 -- 2.1 (2) 
+-- consideration:
+-- - insert into empty comment table (it is the first comment) 
+-- - review on the same product purchase (should remove the old review first): okay
+-- - if remove old review (same product purchase) -> need to delete on comment table or not?
+-- - orderline not exist (not sure if needs to check this?) 
+
+
 CREATE OR REPLACE PROCEDURE review( user_id INTEGER, order_id INTEGER, shop_id INTEGER, product_id INTEGER, sell_timestamp
 TIMESTAMP, content TEXT, rating INTEGER, comment_timestamp TIMESTAMP)
 AS $$
 DECLARE
-  comment_id INTEGER;
-BEGIN
-  INSERT INTO comment(user_id) VALUES (user_id) RETURNING id INTO comment_id;
-  INSERT INTO review(id, order_id, shop_id, product_id, sell_timestamp) VALUES 
-    (comment_id, order_id, shop_id, product_id, sell_timestamp);
-  INSERT INTO review_version(review_id, review_timestamp, content, rating) VALUES 
-    (comment_id, comment_timestamp, content, rating);
+  a_order_id alias for order_id;
+  a_shop_id alias for shop_id;
+  a_product_id alias for product_id;
+  a_sell_timestamp alias for sell_timestamp;
 
+  comment_id INTEGER;
+  is_duplicate BOOLEAN;
+  curs CURSOR FOR (select RV.review_id, RV.review_timestamp, RV.content, RV.rating  
+                  from review_version RV, review R 
+                  where RV.review_id = R.id and R.order_id = a_order_id and R.shop_id = a_shop_id
+                        and R.product_id = a_product_id and R.sell_timestamp = a_sell_timestamp);
+  r1 RECORD;
+
+BEGIN
+  OPEN curs;
+
+  select max(C.id) + 1 INTO comment_id from comment C;
+  insert into comment(id, user_id) values (comment_id, user_id); 
+  
+  select (count(*) > 0) INTO is_duplicate from review R
+  where R.order_id = a_order_id and R.shop_id = a_shop_id and R.product_id = a_product_id
+        and R.sell_timestamp = a_sell_timestamp;
+  
+  IF is_duplicate THEN 
+    delete from review R where R.order_id = a_order_id and R.shop_id = a_shop_id and 
+                            R.product_id = a_product_id and R.sell_timestamp = a_sell_timestamp;
+    insert into review (id, order_id, shop_id , product_id, sell_timestamp) values 
+              (comment_id, order_id, shop_id, product_id, sell_timestamp);
+    insert into review_version (review_id, review_timestamp, content, rating) values 
+                (comment_id, comment_timestamp, content, rating);
+    LOOP 
+      FETCH curs INTO r1;
+      EXIT WHEN NOT FOUND;
+      insert into review_version (review_id, review_timestamp, content, rating) values 
+        (comment_id, r1.review_timestamp, r1.content, r1.rating); 
+    END LOOP;
+  
+  ELSE 
+    insert into review (id, order_id, shop_id , product_id, sell_timestamp) values 
+                (comment_id, order_id, shop_id, product_id, sell_timestamp);
+    insert into review_version (review_id, review_timestamp, content, rating) values 
+                (comment_id, comment_timestamp, content, rating);
+  END IF;
+   
+  
+ 
 END;
 $$ LANGUAGE plpgsql;
 
