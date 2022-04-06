@@ -28,7 +28,7 @@ CREATE TABLE product (
     id SERIAL PRIMARY KEY,
     name TEXT,
     description TEXT,
-    -- Enforce Key+TP constraint
+  -- Enforce Key+TP constraint
     category INTEGER NOT NULL REFERENCES category(id),
     -- Enforce Key+TP constraint
     manufacturer INTEGER NOT NULL REFERENCES manufacturer(id)

@@ -118,11 +118,33 @@ FOR EACH ROW EXECUTE FUNCTION check_refund_delivered_product();
 CREATE OR REPLACE PROCEDURE reply(user_id INTEGER, other_comment_id INTEGER, content TEXT, reply_timestamp TIMESTAMP)
 AS $$
 DECLARE
+    a_user_id ALIAS FOR user_id;
+    a_other_comment_id ALIAS FOR other_comment_id;
+    is_duplicate BOOLEAN;
     comment_id INTEGER;
 BEGIN
-    INSERT INTO comment(user_id) VALUES (user_id) RETURNING id INTO comment_id;
-    INSERT INTO reply(id, other_comment_id) VALUES (comment_id, other_comment_id);
-    INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+    SELECT (count(*) > 0) INTO is_duplicate 
+    FROM reply R, comment C 
+    WHERE C.user_id = a_user_id 
+        AND C.id = R.id 
+        AND R.other_comment_id = a_other_comment_id;
+
+    IF is_duplicate THEN 
+        SELECT R.id INTO comment_id 
+        FROM reply R, comment C
+        WHERE C.user_id = a_user_id 
+            AND C.id = R.id 
+            AND R.other_comment_id = a_other_comment_id;
+        
+        INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+
+    ELSE
+        SELECT COALESCE(max(id) + 1, 1) INTO comment_id FROM comment;
+        INSERT INTO comment(id, user_id) VALUES (comment_id, user_id);
+        INSERT INTO reply(id, other_comment_id) VALUES (comment_id, other_comment_id);
+        INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+    END IF;
+
 END;
 $$ LANGUAGE plpgsql;
 
@@ -131,29 +153,31 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION view_comments(shop_id INTEGER, product_id INTEGER, sell_timestamp TIMESTAMP)
 RETURNS TABLE (username TEXT, content TEXT, rating INTEGER, comment_timestamp TIMESTAMP) AS $$
 DECLARE
+    a_shop_id ALIAS FOR shop_id;
+    a_product_id ALIAS FOR product_id;
+    a_sell_timestamp ALIAS FOR sell_timestamp;
+
     curs CURSOR FOR (
         WITH RECURSIVE related_comments(username, account_closed, comment_id, content, rating, comment_timestamp) AS (
             SELECT U.name, U.account_closed, C.id, RV.content, RV.rating, RV.review_timestamp
             FROM users U, comment C, review R, review_version RV 
-            WHERE R.shop_id = shop_id AND R.product_id = product_id AND R.sell_timestamp = sell_timestamp
+            WHERE R.product_id = a_product_id AND R.shop_id = a_shop_id AND R.sell_timestamp = a_sell_timestamp
                 AND R.id = C.id AND C.user_id = U.id 
-                AND R.id = RV.id AND RV.review_timestamp >= ALL (
+                AND R.id = RV.review_id AND RV.review_timestamp >= ALL (
                     SELECT review_timestamp
                     FROM review_version
-                    WHERE review_id = RV.id 
+                    WHERE review_id = RV.review_id 
                 )
             
             UNION ALL 
 
-            SELECT U.name, U.account_closed, C.id, RV.content, NULL, RV.review_timestamp
-            FROM users U, comment C, reply R, reply_version RV 
-            JOIN related_comments RC 
-            ON RC.comment_id = R.other_comment_id
-            WHERE R.id = C.id AND C.user_id = U.id AND R.id = RV.id
+            SELECT U.name, U.account_closed, C.id, RV.content, NULL, RV.reply_timestamp
+            FROM users U, comment C, reply R, reply_version RV, related_comments RC 
+            WHERE RC.comment_id = R.other_comment_id AND R.id = C.id AND C.user_id = U.id AND R.id = RV.reply_id
                 AND RV.reply_timestamp >= ALL (
                     SELECT reply_timestamp
                     FROM reply_version 
-                    WHERE reply_id = RV.id
+                    WHERE reply_id = RV.reply_id
                 )
         ) 
         SELECT * FROM related_comments ORDER BY comment_timestamp, comment_id
@@ -166,7 +190,7 @@ BEGIN
         EXIT WHEN NOT FOUND;
 
         IF r.account_closed = TRUE 
-            THEN username := "A Deleted User";
+            THEN username := 'A Deleted User';
             ELSE username := r.username;
         END IF;
 
