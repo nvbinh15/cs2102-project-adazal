@@ -87,6 +87,7 @@ CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review
 AFTER INSERT ON comment
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW EXECUTE FUNCTION check_comment();
+-- Add trigger when insert into review and reply
 
 -- 1.(9)
 CREATE OR REPLACE FUNCTION check_reply_version()
@@ -122,8 +123,8 @@ DECLARE
 BEGIN 
     num_of_version := 0;
     SELECT count(*) INTO num_of_version
-    FROM reply_version R 
-    WHERE R.reply_id = NEW.id;
+    FROM review_version R 
+    WHERE R.review_id = NEW.id;
 
     IF num_of_version = 0 THEN 
         RAISE EXCEPTION 'No review version';
