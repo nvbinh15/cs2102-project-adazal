@@ -104,18 +104,50 @@ EXECUTE FUNCTION check_type_complaint();
 
 
 -- 2.1 (2) 
+-- consideration:
+-- - insert into empty comment table (it is the first comment): okay
+-- - review on the same product purchase (should remove the old review first): okay
+-- - if remove old review (same product purchase) -> need to delete on comment table or not?: okay
+-- - orderline not exist (not sure if needs to check this?) 
+
+-- test for duplicate: call review(3, 4, 6, 6, '2021-04-06 20:43:27', 'hi', 1, '2022-04-07 20:43:27');
+-- test for new: call review(7, 9, 10, 19, '2022-02-25 14:48:35', 'hi not duplicate', 2, '2022-02-27 20:43:27');
+
 CREATE OR REPLACE PROCEDURE review( user_id INTEGER, order_id INTEGER, shop_id INTEGER, product_id INTEGER, sell_timestamp
 TIMESTAMP, content TEXT, rating INTEGER, comment_timestamp TIMESTAMP)
 AS $$
 DECLARE
+  a_order_id alias for order_id;
+  a_shop_id alias for shop_id;
+  a_product_id alias for product_id;
+  a_sell_timestamp alias for sell_timestamp;
   comment_id INTEGER;
-BEGIN
-  INSERT INTO comment(user_id) VALUES (user_id) RETURNING id INTO comment_id;
-  INSERT INTO review(id, order_id, shop_id, product_id, sell_timestamp) VALUES 
-    (comment_id, order_id, shop_id, product_id, sell_timestamp);
-  INSERT INTO review_version(review_id, review_timestamp, content, rating) VALUES 
-    (comment_id, comment_timestamp, content, rating);
+  is_duplicate BOOLEAN;
 
+BEGIN  
+  select (count(*) > 0) INTO is_duplicate from review R
+  where R.order_id = a_order_id and R.shop_id = a_shop_id and R.product_id = a_product_id
+        and R.sell_timestamp = a_sell_timestamp;
+  
+  IF is_duplicate THEN 
+    -- if review for product purchase alr exists, just add the latest version to review_version,
+    -- no need to change comment and review table
+    select R.id into comment_id from review R
+    where R.order_id = a_order_id and R.shop_id = a_shop_id and R.product_id = a_product_id 
+        and R.sell_timestamp = a_sell_timestamp;
+    insert into review_version (review_id, review_timestamp, content, rating) values 
+                (comment_id, comment_timestamp, content, rating);
+
+  ELSE 
+    -- if first time review, need to add into all comment + review + review_version table
+    select COALESCE(max(C.id) + 1, 1) INTO comment_id from comment C;
+    insert into comment(id, user_id) values (comment_id, user_id); 
+    insert into review (id, order_id, shop_id , product_id, sell_timestamp) values 
+                (comment_id, order_id, shop_id, product_id, sell_timestamp);
+    insert into review_version (review_id, review_timestamp, content, rating) values 
+                (comment_id, comment_timestamp, content, rating);
+  END IF;
+   
 END;
 $$ LANGUAGE plpgsql;
 
@@ -125,27 +157,35 @@ RETURNS TABLE(shop_id INTEGER, shop_name TEXT, num_negative_indicators INTEGER) 
 
 DECLARE 
   curs CURSOR FOR (
-    select S.shop_id, S.shop_name, (Negative1.count_refund + Negative2.count_shop_complaint + Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
-    from (select R.shop_id, count(*) as count_refund
-          from refund_request R 
-          group by (R.order_id, R.shop_id, R.product_id, R.sell_timestamp)) Negative1,
+    select S.id, S.name, (Negative1.count_refund + Negative2.count_shop_complaint + Negative3.count_delivery_complaint + Negative4.count_bad_review) count_negative_indicators
 
-          (select C.shop_id, count(*) as count_shop_complaint
-          from shop_complaint C) Negative2,
+    from shop S, (select S1.id, COALESCE((select count(*) from refund_request R 
+                                  where R.shop_id = S1.id 
+                                  group by (R.order_id, R.product_id, R.sell_timestamp)),0) count_refund
+                  from Shop S1) as Negative1,
+                  
+                  (select S1.id, COALESCE((select count(*) from shop_complaint C 
+                                    where C.shop_id = S1.id), 0) count_shop_complaint
+                  from Shop S1) as Negative2,
 
-          (select C.shop_id, count(*) as count_delivery_complaint
-          from delivery_complaint C 
-          group by (C.order_id, C.shop_id, C.product_id, C.sell_timestamp)) Negative3,
+                  (select S1.id, COALESCE((select count(*) from delivery_complaint C 
+                                    where C.shop_id = S1.id
+                                    group by (C.order_id, C.product_id, C.sell_timestamp)), 0) count_delivery_complaint
+                  from Shop S1) as Negative3,
 
-          (select R.shop_id, RV.count(*) as count_bad_review 
-          from review R, review_version RV 
-          where R.id = RV.review_id and RV.rating = 1 and 
-              RV.review_timestamp >= ALL (select review_timestamp from review_version)) Negative4,
-          shop S 
-    where Negative1.shop_id = S.shop_id and Negative2.shop_id = S.shop_id and Negative3.shop_id = S.shop_id and Negative4 = S.shop_id 
-    order by count_negative_indicators DESC 
-    limit n
-  );
+                  (select S1.id, COALESCE((select count(*) from review R, review_version RV 
+                                    where R.shop_id = S1.id and R.id = RV.review_id and 
+                                    RV.rating = 1 and 
+                                    RV.review_timestamp >= ALL (select review_timestamp 
+                                                                from review_version RV1
+                                                                where RV1.review_id = R.id)), 0) count_bad_review
+                  from Shop S1) as Negative4
+
+        where Negative1.id = S.id and Negative2.id = S.id and Negative3.id = S.id and 
+              Negative4.id = S.id
+        order by count_negative_indicators DESC, id ASC
+        limit n
+      );
   r RECORD;
 
 BEGIN 
@@ -153,8 +193,8 @@ BEGIN
   LOOP 
     FETCH curs INTO r;
     EXIT WHEN NOT FOUND;
-    shop_id := r.shop_id;
-    shop_name := r.shop_name;
+    shop_id := r.id;
+    shop_name := r.name;
     num_negative_indicators := r.count_negative_indicators;
 
     RETURN NEXT;

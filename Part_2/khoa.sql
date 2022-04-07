@@ -35,7 +35,12 @@ BEGIN
 
     SELECT O.user_id INTO user_order_id
     FROM orders O 
-    WHERE O.id = NEW.order_id;
+    WHERE O.id = NEW.order_id AND EXISTS (
+        SELECT 1
+        FROM orderline Od 
+        WHERE Od.order_id = NEW.order_id AND Od.shop_id = NEW.shop_id AND Od.product_id = NEW.product_id
+        AND Od.sell_timestamp = NEW.sell_timestamp
+    );
 
     IF user_id = user_order_id THEN
         RETURN NEW;
@@ -76,12 +81,57 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION check_insert_reply()
+RETURNS TRIGGER as $$
+DECLARE 
+    review_id INTEGER;
+BEGIN 
+    SELECT Rv.id INTO review_id
+    FROM review Rv
+    WHERE Rv.id = NEW.id;
+
+    IF review_id IS NOT NULL THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION check_insert_review()
+RETURNS TRIGGER as $$
+DECLARE 
+    reply_id INTEGER;
+BEGIN 
+    SELECT Rp.id INTO review_id
+    FROM reply Rp
+    WHERE Rp.id = NEW.id;
+
+    IF reply_id IS NOT NULL THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 DROP TRIGGER IF EXISTS comment_is_either_reply_or_review ON comment;
+DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_reply ON reply;
+DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_review ON review;
 
 CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review 
 AFTER INSERT ON comment
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW EXECUTE FUNCTION check_comment();
+
+CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_reply 
+BEFORE INSERT ON reply
+FOR EACH ROW EXECUTE FUNCTION check_insert_reply();
+
+CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_review 
+BEFORE INSERT ON reivew
+FOR EACH ROW EXECUTE FUNCTION check_insert_review();
+-- Add trigger when insert into review and reply
 
 -- 1.(9)
 CREATE OR REPLACE FUNCTION check_reply_version()
@@ -117,8 +167,8 @@ DECLARE
 BEGIN 
     num_of_version := 0;
     SELECT count(*) INTO num_of_version
-    FROM reply_version R 
-    WHERE R.reply_id = NEW.id;
+    FROM review_version R 
+    WHERE R.review_id = NEW.id;
 
     IF num_of_version = 0 THEN 
         RAISE EXCEPTION 'No review version';
@@ -141,22 +191,22 @@ RETURNS TABLE(product_id INTEGER, product_name TEXT, return_rate NUMERIC(3, 2)) 
 DECLARE
     curs CURSOR FOR (
         WITH product_accept_rate AS (
-            SELECT id, count(refund_status) as num_accept
-            FROM refund_request
-            WHERE status = 'accepted' 
-            GROUP BY product_id
+            SELECT R.product_id, count(id) as num_accept
+            FROM refund_request R
+            WHERE status = 'accepted'
+            GROUP BY R.product_id
         ),
         product_total AS (
-            SELECT id, count(refund_status) as total_refund
-            FROM refund_request
-            GROUP BY product_id
+            SELECT R.product_id, count(id) as total_refund
+            FROM refund_request R
+            GROUP BY R.product_id
         ),
         product_rate AS (
-            SELECT R1.id, ROUND(R1.num_accept/R2.total_refund, 2) as rate
-            FROM product_accept_rate R1 NATURAL JOIN product_total R2 ON R1.id = R2.id
+            SELECT R1.product_id, ROUND(num_accept::decimal/total_refund, 2) as rate
+            FROM product_accept_rate R1 NATURAL JOIN product_total R2
         )
-        SELECT P.id, P.name, coalesce(Re.rate, 0)
-        FROM product P FULL OUTER JOIN product_rate R ON P.id = R.id
+        SELECT P.id, P.name, coalesce(R.rate, 0.00) as rate
+        FROM product P FULL OUTER JOIN product_rate R ON P.id = R.product_id
         WHERE P.manufacturer = manufacturer_id
         ORDER BY rate DESC, P.id
     );
