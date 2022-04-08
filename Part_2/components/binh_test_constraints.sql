@@ -205,10 +205,6 @@ insert into employee (id, name, salary) values (8, 'Fanya Ferrers', 124);
 insert into employee (id, name, salary) values (9, 'Georgie Demageard', 798);
 insert into employee (id, name, salary) values (10, 'Joy Allchin', 89);
 
--- refund_request
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (1, null, 15, 8, 11, '2021-10-07 20:37:57', 10, '3/3/2022', 'pending', null, null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (2, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '1/12/2022', 'being_handled', null, null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (4, 5, 4, 6, 6, '2021-04-06 20:43:27', 1, '1/1/2022','rejected', '1/24/2022', 'Sprain of medial collateral ligament of left knee');
 
 -- complaint
 insert into complaint (id, content, status, user_id, handled_by) values (1, 'Nondisp commnt fx shaft of l femr, 7thK', 'pending', 9, null);
@@ -238,14 +234,29 @@ insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestam
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (5, 4, 6, 6, '2021-04-06 20:43:27');
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (10, 6, 7, 11, '2021-11-15 18:28:53');
 
-/* FUNCTION TEST DATA */
--- view_comments(shop_id INTEGER, product_id INTEGER, sell_timestamp TIMESTAMP)
--- insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (6, 14, 1, 9, '2021-05-23 23:09:20');
+/* TRIGGER TEST DATA */
+-- (4) The refund quantity must not exceed the ordered quantity
+-- (5) The refund request date must be within 30 days of the delivery date
+-- (6) Refund request can only be made for a delivered product
 
-call reply(1, 6, 'reply to comment 6 - reply to a review', '2021-06-23 23:09:20');
-call reply(1, 6, 'second reply to comment 6 - new version of an already existed reply to a review', '2021-07-23 23:09:20');
-call reply(2, 11, 'reply to comment 11 - reply to a reply', '2021-08-23 23:09:20');
-call reply(2, 11, 'second reply to comment 11 - new version of an already existed reply to a reply', '2021-09-23 23:09:20');
+-- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) 
+-- values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '1/21/2022');
 
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 30, '1/12/2022', 'being_handled', null, null);
 
-select * from view_comments(1, 9, '2021-05-23 23:09:20');
+-- 4
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 20, '1/12/2022', 'being_handled', null, null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '1/12/2022', 'being_handled', null, null);
+
+-- 5
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, DATE '2022-2-19', 'being_handled', null, null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, DATE '2022-2-21', 'being_handled', null, null);
+
+-- 6
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
+values (default, null, 2, 5, 6, '2021-12-01 04:25:38', 2, DATE '2022-2-21', 'being_handled', null, null);

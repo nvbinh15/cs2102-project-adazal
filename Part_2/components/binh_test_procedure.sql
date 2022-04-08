@@ -1,5 +1,6 @@
 \i ../drop.sql
 \i ../schema.sql
+\i binh.sql
 
 DELETE FROM users;
 DELETE FROM shop;
