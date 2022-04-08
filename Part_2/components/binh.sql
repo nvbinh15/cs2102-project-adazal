@@ -42,9 +42,10 @@ BEGIN
         and R.shop_id = NEW.shop_id 
         and R.product_id = NEW.product_id 
         and R.sell_timestamp = NEW.sell_timestamp
-        and R.refund_status <> 'rejected';
+        and R.status <> 'rejected';
 
     IF NEW.quantity + current_refund_quantity > order_quantity THEN 
+        RAISE NOTICE 'The refund quantity must not exceed the ordered quantity';
         RETURN NULL;
     END IF;
 
@@ -73,6 +74,7 @@ BEGIN
         and O.sell_timestamp = NEW.sell_timestamp;
         
     IF NEW.request_date > last_valid_date THEN 
+        RAISE NOTICE 'The refund request date must be within 30 days of the delivery date';
         RETURN NULL;
     END IF;
 
@@ -100,6 +102,7 @@ BEGIN
         and O.sell_timestamp = NEW.sell_timestamp;
 
     IF product_status <> 'delivered' THEN 
+        RAISE NOTICE 'Refund request can only be made for a delivered product';
         RETURN NULL;
     END IF;
 
