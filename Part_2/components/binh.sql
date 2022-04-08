@@ -42,9 +42,10 @@ BEGIN
         and R.shop_id = NEW.shop_id 
         and R.product_id = NEW.product_id 
         and R.sell_timestamp = NEW.sell_timestamp
-        and R.refund_status <> 'rejected';
+        and R.status <> 'rejected';
 
     IF NEW.quantity + current_refund_quantity > order_quantity THEN 
+        RAISE NOTICE 'The refund quantity must not exceed the ordered quantity';
         RETURN NULL;
     END IF;
 
@@ -73,6 +74,7 @@ BEGIN
         and O.sell_timestamp = NEW.sell_timestamp;
         
     IF NEW.request_date > last_valid_date THEN 
+        RAISE NOTICE 'The refund request date must be within 30 days of the delivery date';
         RETURN NULL;
     END IF;
 
@@ -100,6 +102,7 @@ BEGIN
         and O.sell_timestamp = NEW.sell_timestamp;
 
     IF product_status <> 'delivered' THEN 
+        RAISE NOTICE 'Refund request can only be made for a delivered product';
         RETURN NULL;
     END IF;
 
@@ -118,12 +121,33 @@ FOR EACH ROW EXECUTE FUNCTION check_refund_delivered_product();
 CREATE OR REPLACE PROCEDURE reply(user_id INTEGER, other_comment_id INTEGER, content TEXT, reply_timestamp TIMESTAMP)
 AS $$
 DECLARE
+    a_user_id ALIAS FOR user_id;
+    a_other_comment_id ALIAS FOR other_comment_id;
+    is_duplicate BOOLEAN;
     comment_id INTEGER;
 BEGIN
-    SELECT max(id) + 1 INTO comment_id FROM comment;
-    INSERT INTO comment(id, user_id) VALUES (comment_id, user_id);
-    INSERT INTO reply(id, other_comment_id) VALUES (comment_id, other_comment_id);
-    INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+    SELECT (count(*) > 0) INTO is_duplicate 
+    FROM reply R, comment C 
+    WHERE C.user_id = a_user_id 
+        AND C.id = R.id 
+        AND R.other_comment_id = a_other_comment_id;
+
+    IF is_duplicate THEN 
+        SELECT R.id INTO comment_id 
+        FROM reply R, comment C
+        WHERE C.user_id = a_user_id 
+            AND C.id = R.id 
+            AND R.other_comment_id = a_other_comment_id;
+        
+        INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+
+    ELSE
+        SELECT COALESCE(max(id) + 1, 1) INTO comment_id FROM comment;
+        INSERT INTO comment(id, user_id) VALUES (comment_id, user_id);
+        INSERT INTO reply(id, other_comment_id) VALUES (comment_id, other_comment_id);
+        INSERT INTO reply_version(reply_id, reply_timestamp, content) VALUES (comment_id, reply_timestamp, content);
+    END IF;
+
 END;
 $$ LANGUAGE plpgsql;
 

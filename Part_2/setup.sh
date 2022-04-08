@@ -10,7 +10,7 @@ database="AdazalDatabase"
 createdb -U postgres AdazalDatabase
 
 # Import .sql files into database
-psql -d $database -U postgres -f schema.sql -f data.sql -f triggers.sql -f procedures.sql -f functions.sql
+psql -d $database -U postgres -f schema.sql -f test.sql -f triggers.sql -f procedures.sql -f functions.sql
 
 echo ##########################
 echo ###displaying tables...###
