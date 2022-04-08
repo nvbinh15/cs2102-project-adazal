@@ -124,7 +124,7 @@ AFTER INSERT ON comment
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW EXECUTE FUNCTION check_comment();
 
-CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_reply 
+CREATE TRIGGER comment_is_either_reply_or_review_insert_reply 
 BEFORE INSERT ON reply
 FOR EACH ROW EXECUTE FUNCTION check_insert_reply();
 
