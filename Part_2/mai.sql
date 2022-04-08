@@ -83,6 +83,49 @@ BEGIN
 
   if (NOT (is_shop or is_comment or is_delivery)) then 
     RAISE EXCEPTION 'complaint is none of the type shop, comment, or delivery';
+  if (is_shop and is_delivery) then 
+    RAISE EXCEPTION 'complaint is both of type shop and delivery';
+  elsif (is_delivery and is_comment) then 
+    RAISE EXCEPTION 'complaint is both of type delivery and comment';
+  elsif (is_comment and is_shop) then 
+    RAISE EXCEPTION 'complaint is both of type comment and shop';
+  else 
+    RETURN NULL;
+  END IF;
+END;
+
+$$ LANGUAGE plpgsql;
+DROP TRIGGER IF EXISTS check_type_complaint ON complaint;
+CREATE CONSTRAINT TRIGGER check_type_complaint
+AFTER INSERT ON complaint
+DEFERRABLE INITIALLY IMMEDIATE
+FOR EACH ROW 
+EXECUTE FUNCTION check_type_complaint();
+
+
+CREATE OR REPLACE FUNCTION check_type_complaint()
+RETURNS TRIGGER AS $$ 
+
+DECLARE 
+  is_delivery BOOLEAN;
+  is_shop BOOLEAN;
+  is_comment BOOLEAN;
+
+BEGIN 
+  select (count(*) > 0) into is_shop 
+  from shop_complaint C
+  where C.id = OLD.id;
+
+  select (count(*) > 0) into is_comment 
+  from comment_complaint C
+  where C.id = OLD.id; 
+
+  select (count(*) > 0) into is_delivery
+  from delivery_complaint C
+  where C.id = OLD.id; 
+
+  if (NOT (is_shop or is_comment or is_delivery)) then 
+    RAISE EXCEPTION 'complaint is none of the type shop, comment, or delivery';
   elsif (is_shop and is_delivery) then 
     RAISE EXCEPTION 'complaint is both of type shop and delivery';
   elsif (is_delivery and is_comment) then 
@@ -101,6 +144,7 @@ AFTER INSERT ON complaint
 DEFERRABLE INITIALLY IMMEDIATE
 FOR EACH ROW 
 EXECUTE FUNCTION check_type_complaint();
+
 
 
 -- 2.1 (2) 

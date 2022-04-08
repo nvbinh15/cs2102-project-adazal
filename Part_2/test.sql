@@ -1,25 +1,5 @@
-DELETE FROM users;
-DELETE FROM shop;
-DELETE FROM category;
-DELETE FROM manufacturer;
-DELETE FROM product;
-DELETE FROM sells;
-DELETE FROM coupon_batch;
-DELETE FROM issued_coupon;
-DELETE FROM orders;
-DELETE FROM orderline;
-DELETE FROM comment;
-DELETE FROM review;
-DELETE FROM review_version;
-DELETE FROM reply;
-DELETE FROM reply_version;
-
--- truncate table users;
--- truncate table shop;
--- truncate table category;
--- truncate table manufacturer;
--- truncate table product;
--- truncate table sells;
+\i drop.sql;
+\i schema.sql;
 
 --USERS
 insert into users (id, address, name, account_closed) values (1, '6918 Esch Circle', 'Derrik Melmoth', false);
@@ -220,7 +200,7 @@ insert into employee (id, name, salary) values (10, 'Joy Allchin', 89);
 -- refund_request
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (1, null, 15, 8, 11, '2021-10-07 20:37:57', 10, '3/3/2022', 'pending', null, null);
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (2, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '1/12/2022', 'being_handled', null, null);
-insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (3, 5, 4, 6, 6, '2021-11-15 18:28:53', 8, '6/9/2021', 'accepted', '6/10/2021', null);
+insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (3, 9, 6, 7, 11, '2021-11-15 18:28:53', 8, '6/9/2021', 'accepted', '6/10/2021', null);
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) values (4, 5, 4, 6, 6, '2021-04-06 20:43:27', 1, '1/1/2022','rejected', '1/24/2022', 'Sprain of medial collateral ligament of left knee');
 
 -- complaint
