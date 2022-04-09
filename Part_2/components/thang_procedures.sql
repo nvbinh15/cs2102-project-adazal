@@ -11,7 +11,7 @@ DECLARE
     i INTEGER;
     price NUMERIC;
 BEGIN
-    order_id := (SELECT MAX(id) FROM Orders) + 1;
+    order_id := (SELECT COALESCE(MAX(id), 0) FROM Orders) + 1;
     INSERT INTO Orders(id, user_id, coupon_id, shipping_address, payment_amount)
     VALUES (order_id, user_id, NULL, shipping_address, 0);
     payment := 0;

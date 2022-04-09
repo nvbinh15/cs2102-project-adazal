@@ -80,7 +80,7 @@ BEGIN
         WHERE O.order_id = NEW.id
     );
     IF total_amount < minimum_amount THEN
-        RAISE EXCEPTION 'A coupon can only be used on an order whose total amount (before the coupon is applied) exceeds the minimum order amount.';
+        RAISE EXCEPTION 'A coupon can only be used on an order whose total amount % (before the coupon is applied) exceeds the minimum order amount %.', total_amount, minimum_amount;
         RETURN NULL;
     END IF;
     RETURN NEW;
@@ -89,6 +89,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS order_coupon_trigger ON Orders;
 
-CREATE TRIGGER order_coupon_trigger
-BEFORE INSERT ON Orders
+CREATE CONSTRAINT TRIGGER order_coupon_trigger
+AFTER INSERT ON Orders
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_order_coupon();
