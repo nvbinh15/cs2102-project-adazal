@@ -129,12 +129,9 @@ insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) v
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (15, 8, null, '26 Brickson Park Circle', 14);
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (16, 10, null, '8 Schlimgen Drive', 16);
 
-<<<<<<< HEAD
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (17, 5, null, '8 Schlimgen Drive', 16);
 insert into orders (id, user_id , coupon_id, shipping_address, payment_amount) values (19, 8, null, '8 Schlimgen Drive', 16);
 
-=======
->>>>>>> c1a1ecbdb49246cf331a09a0e627ef8a30cc402e
 -- orderline
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (9, 10, 14, '2021-04-12 13:40:58', 96, 56, 'shipped', '12/17/2021');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (15, 8, 11, '2021-10-07 20:37:57', 83, 48, 'delivered', '5/28/2021');
@@ -144,17 +141,12 @@ insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, 
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (4, 6, 6, '2021-04-06 20:43:27', 94, 62, 'delivered', '11/18/2021');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 2, 17, '2022-03-16 22:13:20', 25, 21, 'being_processed', null);
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (14, 1, 9, '2021-05-23 23:09:20', 36, 77, 'being_processed', null);
-<<<<<<< HEAD
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 5, 6, '2021-12-01 04:25:38', 39, 61, 'shipped', '11/6/2021');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '21/1/2022');
 
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (1, 7, 11, '2021-04-12 13:40:58', 42, 27, 'delivered', '21/1/2022');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (17, 10, 14, '2021-11-15 18:28:53', 42, 27, 'delivered', '21/1/2022');
 insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (19, 7, 11, '2021-04-13 13:40:58', 42, 27, 'delivered', '21/1/2022');
-=======
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 5, 6, '2021-12-01 04:25:38', 39, 61, 'shipped', '6/11/2021');
-insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '1/21/2022');
->>>>>>> c1a1ecbdb49246cf331a09a0e627ef8a30cc402e
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (8, 5, 1, '9/1/2021', 97, 4, 'Lotlux', '12/21/2021');
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (2, 7, 13, '12/17/2021', 3, 33, 'Veribet', '9/30/2021');
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) values (5, 8, 8, '2/20/2022', 4, 29, 'Lotstring', '2/2/2022');
@@ -177,11 +169,8 @@ insert into comment (id, user_id ) values (8, 2);
 insert into comment (id, user_id ) values (2, 4);
 insert into comment (id, user_id ) values (6, 10);
 insert into comment (id, user_id ) values (1, 2);
-<<<<<<< HEAD
 insert into comment (id, user_id) values (11, 3);
 insert into comment (id, user_id) values (12, 8);
-=======
->>>>>>> c1a1ecbdb49246cf331a09a0e627ef8a30cc402e
 
 --review
 insert into review (id, order_id, shop_id , product_id, sell_timestamp) values (5, 9, 10, 14, '2021-04-12 13:40:58');
