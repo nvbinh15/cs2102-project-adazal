@@ -694,7 +694,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- (2)
+-- (2) get_most_returned_products_from_manufacturer
 CREATE OR REPLACE FUNCTION get_most_returned_products_from_manufacturer(IN manufacturer_id INTEGER, IN n INTEGER)
 RETURNS TABLE(product_id INTEGER, product_name TEXT, return_rate NUMERIC(3, 2)) AS $$
 DECLARE
@@ -734,7 +734,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- (3)
+-- (3) get_worst_shops
 CREATE OR REPLACE FUNCTION get_worst_shops(n INTEGER)
 RETURNS TABLE(shop_id INTEGER, shop_name TEXT, num_negative_indicators INTEGER) AS $$
 
