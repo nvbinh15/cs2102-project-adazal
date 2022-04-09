@@ -1,25 +1,6 @@
-DELETE FROM users;
-DELETE FROM shop;
-DELETE FROM category;
-DELETE FROM manufacturer;
-DELETE FROM product;
-DELETE FROM sells;
-DELETE FROM coupon_batch;
-DELETE FROM issued_coupon;
-DELETE FROM orders;
-DELETE FROM orderline;
-DELETE FROM comment;
-DELETE FROM review;
-DELETE FROM review_version;
-DELETE FROM reply;
-DELETE FROM reply_version;
+\i drop.sql;
+\i schema.sql;
 
--- truncate table users;
--- truncate table shop;
--- truncate table category;
--- truncate table manufacturer;
--- truncate table product;
--- truncate table sells;
 
 --USERS
 insert into users (id, address, name, account_closed) values (1, '6918 Esch Circle', 'Derrik Melmoth', false);
@@ -250,3 +231,8 @@ insert into shop_complaint (id, shop_id) values (1, 6);
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (4, 15, 8, 11, '2021-10-07 20:37:57');
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (5, 4, 6, 6, '2021-04-06 20:43:27');
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (10, 6, 7, 11, '2021-11-15 18:28:53');
+
+
+\i components/mai.sql;
+-- create 1st comment
+call review(7, 9, 10, 19, '2022-02-25 14:48:35', 'hi not duplicate', 2, '2022-02-27 20:43:27');

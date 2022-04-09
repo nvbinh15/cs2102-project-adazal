@@ -95,56 +95,108 @@ BEGIN
 END;
 
 $$ LANGUAGE plpgsql;
-DROP TRIGGER IF EXISTS check_type_complaint ON complaint;
-CREATE CONSTRAINT TRIGGER check_type_complaint
-AFTER INSERT ON complaint
-DEFERRABLE INITIALLY IMMEDIATE
-FOR EACH ROW 
-EXECUTE FUNCTION check_type_complaint();
+
+CREATE OR REPLACE FUNCTION check_insert_delivery_complaint() 
+RETURNS TRIGGER AS $$ 
+
+DECLARE 
+  is_shop BOOLEAN;
+  is_comment BOOLEAN;
+
+BEGIN
+  select (count(*) > 0) into is_shop
+  from shop_complaint C 
+  where NEW.id = C.id;
+
+  select (count(*) > 0) into is_comment 
+  from comment_complaint C
+  where C.id = OLD.id;
+
+  if (is_shop or is_comment) then 
+    RETURN NULL;
+  else 
+    RETURN NEW;
+  END IF;
+
+END;
+
+$$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION check_type_complaint()
+CREATE OR REPLACE FUNCTION check_insert_shop_complaint() 
+RETURNS TRIGGER AS $$ 
+
+DECLARE 
+  is_delivery BOOLEAN;
+  is_comment BOOLEAN;
+
+BEGIN
+  select (count(*) > 0) into is_delivery
+  from delivery_complaint C 
+  where NEW.id = C.id;
+
+  select (count(*) > 0) into is_comment 
+  from comment_complaint C
+  where C.id = OLD.id;
+
+  if (is_delivery or is_comment) then 
+    RETURN NULL;
+  else 
+    RETURN NEW;
+  END IF;
+
+END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION check_insert_comment_complaint() 
 RETURNS TRIGGER AS $$ 
 
 DECLARE 
   is_delivery BOOLEAN;
   is_shop BOOLEAN;
-  is_comment BOOLEAN;
 
-BEGIN 
-  select (count(*) > 0) into is_shop 
-  from shop_complaint C
-  where C.id = OLD.id;
-
-  select (count(*) > 0) into is_comment 
-  from comment_complaint C
-  where C.id = OLD.id; 
-
+BEGIN
   select (count(*) > 0) into is_delivery
   from delivery_complaint C
-  where C.id = OLD.id; 
+  where C.id = OLD.id;
 
-  if (NOT (is_shop or is_comment or is_delivery)) then 
-    RAISE EXCEPTION 'complaint is none of the type shop, comment, or delivery';
-  elsif (is_shop and is_delivery) then 
-    RAISE EXCEPTION 'complaint is both of type shop and delivery';
-  elsif (is_delivery and is_comment) then 
-    RAISE EXCEPTION 'complaint is both of type delivery and comment';
-  elsif (is_comment and is_shop) then 
-    RAISE EXCEPTION 'complaint is both of type comment and shop';
-  else 
+  select (count(*) > 0) into is_shop
+  from shop_complaint C 
+  where NEW.id = C.id;
+
+  if (is_delivery or is_shop) then 
     RETURN NULL;
+  else 
+    RETURN NEW;
   END IF;
+
 END;
 
 $$ LANGUAGE plpgsql;
-DROP TRIGGER IF EXISTS check_type_complaint ON complaint;
-CREATE CONSTRAINT TRIGGER check_type_complaint
-AFTER INSERT ON complaint 
-DEFERRABLE INITIALLY IMMEDIATE
-FOR EACH ROW 
-EXECUTE FUNCTION check_type_complaint();
 
+DROP TRIGGER IF EXISTS check_type_complaint ON complaint;
+DROP TRIGGER IF EXISTS check_insert_delivery_complaint ON delivery_complaint;
+DROP TRIGGER IF EXISTS check_insert_shop_complaint ON shop_complaint;
+DROP TRIGGER IF EXISTS check_insert_comment_complaint ON comment_complaint;
+
+CREATE CONSTRAINT TRIGGER check_type_complaint
+AFTER INSERT ON complaint
+DEFERRABLE INITIALLY DEFERRED 
+FOR EACH ROW EXECUTE FUNCTION check_type_complaint();
+
+CREATE TRIGGER check_insert_delivery_complaint 
+BEFORE INSERT ON delivery_complaint
+FOR EACH ROW EXECUTE FUNCTION check_insert_delivery_complaint();
+
+CREATE TRIGGER check_insert_shop_complaint 
+BEFORE INSERT ON shop_complaint
+FOR EACH ROW EXECUTE FUNCTION check_insert_shop_complaint();
+
+CREATE TRIGGER check_insert_comment_complaint 
+BEFORE INSERT ON comment_complaint
+FOR EACH ROW EXECUTE FUNCTION check_insert_comment_complaint();
 
 
 -- 2.1 (2) 
