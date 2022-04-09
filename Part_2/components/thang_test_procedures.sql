@@ -39,6 +39,21 @@ COMMIT;
 -- payment amount computed correctly,
 -- quantity in Sells updated accordingly
 CALL place_order(
+    1, NULL, 'NUS PGPR', 
+    '{1, 1}', '{1, 2}', '{"2021-04-12 13:40:58", "2021-10-07 20:37:57"}',
+    '{3, 1}', '{10, 20}'
+);
+SELECT * FROM Orders;
+SELECT *
+FROM Orderline O JOIN Sells S
+ON ROW(O.shop_id, O.product_id, O.sell_timestamp) = ROW(S.shop_id, S.product_id, S.sell_timestamp)
+WHERE O.order_id = (
+    SELECT MAX(id)
+    FROM Orders
+);
+
+-- Test 2: No coupon
+CALL place_order(
     1, 1, 'NUS PGPR', 
     '{1, 1}', '{1, 2}', '{"2021-04-12 13:40:58", "2021-10-07 20:37:57"}',
     '{3, 1}', '{10, 20}'
