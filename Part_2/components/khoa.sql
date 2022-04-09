@@ -74,7 +74,7 @@ BEGIN
     IF review_id IS NULL AND reply_id IS NULL THEN 
         RAISE EXCEPTION 'Comment is neither a review or reply';
     ELSIF review_id IS NOT NULL AND reply_id IS NOT NULL THEN 
-        RAISE EXCEPTION 'Comment is both a review or reply';
+        RAISE EXCEPTION 'Comment is both a review and reply';
     END IF;
 
     RETURN NEW;
@@ -103,7 +103,7 @@ RETURNS TRIGGER as $$
 DECLARE 
     reply_id INTEGER;
 BEGIN 
-    SELECT Rp.id INTO review_id
+    SELECT Rp.id INTO reply_id
     FROM reply Rp
     WHERE Rp.id = NEW.id;
 
@@ -121,15 +121,15 @@ DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_review ON review
 
 CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review 
 AFTER INSERT ON comment
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_comment();
 
-CREATE TRIGGER comment_is_either_reply_or_review_insert_reply 
+CREATE TRIGGER comment_is_either_reply_or_review_insert_reply
 BEFORE INSERT ON reply
 FOR EACH ROW EXECUTE FUNCTION check_insert_reply();
 
-CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review_insert_review 
-BEFORE INSERT ON reivew
+CREATE TRIGGER comment_is_either_reply_or_review_insert_review 
+BEFORE INSERT ON review
 FOR EACH ROW EXECUTE FUNCTION check_insert_review();
 -- Add trigger when insert into review and reply
 
@@ -156,7 +156,7 @@ DROP TRIGGER IF EXISTS insert_reply_version ON reply;
 
 CREATE CONSTRAINT TRIGGER insert_reply_version
 AFTER INSERT ON reply
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_reply_version();
 
 -- 1.(10)
@@ -182,7 +182,7 @@ DROP TRIGGER IF EXISTS insert_review_version ON review;
 
 CREATE CONSTRAINT TRIGGER insert_review_version
 AFTER INSERT ON review
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_review_version();
 
 -- 2.2.(2)
