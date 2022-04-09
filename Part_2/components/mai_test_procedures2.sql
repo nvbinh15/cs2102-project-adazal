@@ -1,5 +1,6 @@
-\i drop.sql;
-\i schema.sql;
+\i ../drop.sql
+\i ../schema.sql
+\i ../proc.sql
 
 
 --USERS

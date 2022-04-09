@@ -1,6 +1,6 @@
-\i drop.sql;
-\i schema.sql;
-
+\i ../drop.sql
+\i ../schema.sql
+\i ../proc.sql
 
 insert into users (id, address, name, account_closed) values (1, '6918 Esch Circle', 'Derrik Melmoth', false);
 insert into users (id, address, name, account_closed) values (2, '8 Mcbride Place', 'Deina Coultard', true);

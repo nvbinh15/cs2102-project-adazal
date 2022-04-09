@@ -1,7 +1,6 @@
 \i ../drop.sql
 \i ../schema.sql
-\i thang_triggers.sql
-\i thang_procedures.sql
+\i ../proc.sql
 
 /*
     TRIGGER (1)

@@ -1,6 +1,6 @@
-\i drop.sql
-\i schema.sql
-\i components/khoa.sql
+\i ../drop.sql
+\i ../schema.sql
+\i ../proc.sql
 
 DELETE FROM users;
 DELETE FROM shop;
