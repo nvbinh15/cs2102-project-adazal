@@ -45,7 +45,7 @@ BEGIN
     IF user_id = user_order_id THEN
         RETURN NEW;
     END IF;
-    
+
     RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
@@ -121,7 +121,7 @@ DROP TRIGGER IF EXISTS comment_is_either_reply_or_review_insert_review ON review
 
 CREATE CONSTRAINT TRIGGER comment_is_either_reply_or_review 
 AFTER INSERT ON comment
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_comment();
 
 CREATE TRIGGER comment_is_either_reply_or_review_insert_reply
@@ -156,7 +156,7 @@ DROP TRIGGER IF EXISTS insert_reply_version ON reply;
 
 CREATE CONSTRAINT TRIGGER insert_reply_version
 AFTER INSERT ON reply
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_reply_version();
 
 -- 1.(10)
@@ -182,7 +182,7 @@ DROP TRIGGER IF EXISTS insert_review_version ON review;
 
 CREATE CONSTRAINT TRIGGER insert_review_version
 AFTER INSERT ON review
-DEFERRABLE INITIALLY IMMEDIATE
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION check_review_version();
 
 -- 2.2.(2)
