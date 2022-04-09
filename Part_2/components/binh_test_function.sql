@@ -247,5 +247,11 @@ call reply(1, 6, 'second reply to comment 6 - new version of an already existed 
 call reply(2, 11, 'reply to comment 11 - reply to a reply', '2021-08-23 23:09:20');
 call reply(2, 11, 'second reply to comment 11 - new version of an already existed reply to a reply', '2021-09-23 23:09:20');
 
-
+SELECT 1 as function, 'long chain, multiple version of comment' as test_type;
 select * from view_comments(1, 9, '2021-05-23 23:09:20');
+
+SELECT 1 as function, 'short chain, one version of comment' as test_type;
+select * from view_comments(10, 14, '2021-04-12 13:40:58');
+
+SELECT 1 as function, 'no related comment' as test_type;
+select * from view_comments(5, 6, '2021-12-01 04:25:38');

@@ -242,21 +242,27 @@ insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestam
 -- insert into orderline (order_id, shop_id, product_id, sell_timestamp, quantity, shipping_cost, status, delivery_date) 
 -- values (6, 7, 11, '2021-11-15 18:28:53', 42, 27, 'delivered', '1/21/2022');
 
+SELECT 4 as trigger, 'positive' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 30, '1/12/2022', 'being_handled', null, null);
 
 -- 4
+SELECT 4 as trigger, 'negative' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 20, '1/12/2022', 'being_handled', null, null);
+SELECT 4 as trigger, 'positive' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, '1/12/2022', 'being_handled', null, null);
 
 -- 5
+SELECT 5 as trigger, 'positive' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, DATE '2022-2-19', 'being_handled', null, null);
+SELECT 4 as trigger, 'negative' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (DEFAULT, 10, 6, 7, 11, '2021-11-15 18:28:53', 2, DATE '2022-2-21', 'being_handled', null, null);
 
 -- 6
+SELECT 6 as trigger, 'negative' as test_type;
 insert into refund_request (id, handled_by, order_id , shop_id , product_id, sell_timestamp, quantity, request_date, status, handled_date, rejection_reason) 
 values (default, null, 2, 5, 6, '2021-12-01 04:25:38', 2, DATE '2022-2-21', 'being_handled', null, null);
