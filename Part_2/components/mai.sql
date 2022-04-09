@@ -71,19 +71,19 @@ DECLARE
 BEGIN 
   select (count(*) > 0) into is_shop 
   from shop_complaint C
-  where C.id = OLD.id;
+  where C.id = NEW.id;
 
   select (count(*) > 0) into is_comment 
   from comment_complaint C
-  where C.id = OLD.id; 
+  where C.id = NEW.id; 
 
   select (count(*) > 0) into is_delivery
   from delivery_complaint C
-  where C.id = OLD.id; 
+  where C.id = NEW .id; 
 
   if (NOT (is_shop or is_comment or is_delivery)) then 
     RAISE EXCEPTION 'complaint is none of the type shop, comment, or delivery';
-  if (is_shop and is_delivery) then 
+  elsif (is_shop and is_delivery) then 
     RAISE EXCEPTION 'complaint is both of type shop and delivery';
   elsif (is_delivery and is_comment) then 
     RAISE EXCEPTION 'complaint is both of type delivery and comment';
@@ -110,14 +110,13 @@ BEGIN
 
   select (count(*) > 0) into is_comment 
   from comment_complaint C
-  where C.id = OLD.id;
+  where C.id = NEW.id;
 
   if (is_shop or is_comment) then 
     RETURN NULL;
   else 
     RETURN NEW;
   END IF;
-
 END;
 
 $$ LANGUAGE plpgsql;
@@ -137,7 +136,7 @@ BEGIN
 
   select (count(*) > 0) into is_comment 
   from comment_complaint C
-  where C.id = OLD.id;
+  where C.id = NEW.id;
 
   if (is_delivery or is_comment) then 
     RETURN NULL;
@@ -160,7 +159,7 @@ DECLARE
 BEGIN
   select (count(*) > 0) into is_delivery
   from delivery_complaint C
-  where C.id = OLD.id;
+  where C.id = NEW.id;
 
   select (count(*) > 0) into is_shop
   from shop_complaint C 

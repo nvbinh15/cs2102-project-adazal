@@ -1,15 +1,6 @@
 \i drop.sql;
 \i schema.sql;
-\i components/mai.sql;
 
--- truncate table users;
--- truncate table shop;
--- truncate table category;
--- truncate table manufacturer;
--- truncate table product;
--- truncate table sells;
-
---USERS
 insert into users (id, address, name, account_closed) values (1, '6918 Esch Circle', 'Derrik Melmoth', false);
 insert into users (id, address, name, account_closed) values (2, '8 Mcbride Place', 'Deina Coultard', true);
 insert into users (id, address, name, account_closed) values (3, '90 Pine View Drive', 'Innis Alliberton', true);
@@ -240,89 +231,61 @@ insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestam
 insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (10, 6, 7, 11, '2021-11-15 18:28:53');
 
 
--- trigger 11 
-delete from delivery_complaint where id = 10;
--- TC1: insert to delivery_complaint when product has not delivered
--- expect: cannot inser0
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) 
-values (10, 9, 10, 14, '2021-04-12 13:40:58'); 
-
--- TC2: insert to delivery_complaint when product has been delivered 
--- expected: can insert
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) 
-values (10, 6, 7, 11, '2021-11-15 18:28:53'); 
+\i components/mai.sql;
 
 -- trigger 12
 -- TC1: none of complaint type
 insert into complaint (id, content, status, user_id, handled_by) 
 values (11, 'Animal-rider injured in unsp transport accident, init encntr', 'addressed', 5, 1);
 
--- TC2: just delivery complaint
+-- TC2: triggered when insert deli
 BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (11, 9, 10, 14, '2021-04-12 13:40:58');
-COMMIT;
-
--- TC3: just shop complaint
-BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
-insert into shop_complaint(id, shop_id) values (11, 10);
-COMMIT;
-
--- TC4: just comment complaint
-BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
+insert into complaint (id, content, status, user_id, handled_by) values (11, 'test deli complaint trigger', 'addressed', 5, 1);
 insert into comment_complaint (id, comment_id) values (11, 6);
+insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (11, 15, 8, 11, '2021-10-07 20:37:57');
 COMMIT;
 
--- TC5: triggered when insert deli
+-- TC3: triggered when insert comment
 BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
-insert into comment_complaint (id, comment_id) values (11, 6);
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (11, 9, 10, 14, '2021-04-12 13:40:58');
+insert into complaint (id, content, status, user_id, handled_by) values (12, 'test comment complaint trigger', 'addressed', 5, 1);
+insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (12, 15, 8, 11, '2021-10-07 20:37:57');
+insert into comment_complaint (id, comment_id) values (12, 6);
 COMMIT;
 
--- TC6: triggered when insert comment
+-- TC4: triggered when insert shop
 BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (11, 9, 10, 14, '2021-04-12 13:40:58');
-insert into comment_complaint (id, comment_id) values (11, 6);
+insert into complaint (id, content, status, user_id, handled_by) values (13, 'test shop complaint trigger', 'addressed', 5, 1);
+insert into shop_complaint(id, shop_id) values (13, 10);
+insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (13, 15, 8, 11, '2021-10-07 20:37:57');
 COMMIT;
 
--- TC7: triggered when insert shop
+-- TC5: just delivery complaint
 BEGIN;
-SET CONSTRAINTS check_type_complaint DEFERRED;
-insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (11, 9, 10, 14, '2021-04-12 13:40:58');
-insert into complaint (id, content, status, user_id, handled_by) values (11, 'test 11', 'addressed', 5, 1);
-insert into shop_complaint(id, shop_id) values (11, 10);
+insert into complaint (id, content, status, user_id, handled_by) values (14, 'deli complaint okay', 'addressed', 5, 1);
+insert into delivery_complaint (id, order_id, shop_id, product_id, sell_timestamp) values (14, 15, 8, 11, '2021-10-07 20:37:57');
 COMMIT;
 
--- procedures 2
--- TC1: review on the same product purchase
--- expected: move current review to review_version, add new review to review + review_version 
-call review(3, 4, 6, 6, '2021-04-06 20:43:27', 'hi', 1, '2022-04-07 20:43:27');
+-- TC6: just shop complaint
+BEGIN;
+insert into complaint (id, content, status, user_id, handled_by) values (15, 'shop complaint okay', 'addressed', 5, 1);
+insert into shop_complaint(id, shop_id) values (15, 10);
+COMMIT;
 
--- TC2: 1st review for product purchase 
--- expected: added to comment + review + review_version
-call review(7, 9, 10, 19, '2022-02-25 14:48:35', 'hi not duplicate', 2, '2022-02-27 20:43:27');
+-- TC7: just comment complaint
+BEGIN;
+insert into complaint (id, content, status, user_id, handled_by) values (16, 'comment complaint okay', 'addressed', 5, 1);
+insert into comment_complaint (id, comment_id) values (16, 6);
+COMMIT;
 
--- TC3: add to empty comment table
--- \i components/mai_test_procedures.sql;
+select * from complaint;
+select * from delivery_complaint;
+select * from comment_complaint;
+select * from shop_complaint;
+
+-- expected:
+-- complaint: 11 -> 16
+-- delivery_complaint: add 12, 14
+-- comment_complaint: add 11, 16
+-- shop_complaint: add 13, 15
 
 
--- function
-
-
-
-
-
-
-
-
-\i test.sql;
-\i components/mai.sql;
